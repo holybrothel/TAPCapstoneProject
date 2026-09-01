@@ -1,35 +1,38 @@
-1. Project Title
-  T.A.P (Tiger Attendance Portal) “Everybody T.A.P in for class to get credit”
+1. Project Name & Team Members:
+    Name: T.A.P (Tiger Attendance Portal)
+    Team Members: Coda Black, Tajah Refuge, Derrick Ellis, Novick Dragnire
 
-2. Problem Statement
+2. Problem Statement:
   Manual attendance can take up class time, create inaccurate records, and make attendance hard to manage. Students may be marked incorrectly, and old methods allow one student to check in for another.
 
-3. Proposed Solution
-  T.A.P. is a simple attendance system that lets an instructor create a class session and generate a QR code. Students scan the code to check in, and the system automatically records the student, session, and check-in time. The teacher can then review the attendance list.
+3. Target Users:
+     The target users are staff and student in the classroom setting.
 
-4. Project Objectives
-  We as a team plan to accomplish these objectives:
-    - Develop a working student attendance database that stores students, courses, class sessions, and attendance records securely.
-    - Implement an automatic check-in method, mainly using QR codes, with duplicate detection and a manual fallback option.
-    - Create a professor dashboard that allows them to create sessions, monitor attendance, review records, and make authorized corrections.
-    - Implement reporting and export functionality so professors can view attendance information and generate useful attendance reports.
-    - Evaluate the system for accuracy, usability, privacy, and reliability through testing of normal use cases, failure cases, duplicate check-ins, and correction workflows.
+4. Main Features — Priority Order:
+    1.	QR Code Attendance Check-In	Students scan a QR code generated for an active class session to record their attendance.
+    2.	Instructor Session Management	Instructors can create class sessions and generate a QR code for each session.
+    3.	Attendance Records	The system automatically records the student, class session, and check-in time.
+    4.	Instructor Attendance Dashboard	Instructors can view attendance for an active or previous class session and make authorized corrections.
+    5.	Attendance Reporting & Export	Instructors can review attendance information and generate/export useful attendance reports.
 
-5. Expected Outcome
-  The project will deliver a working prototype that demonstrates one complete attendance workflow: create a session -> generate QR code -> student checks in -> attendance is recorded -> instructor reviews the result. This keeps the first version small, functional, and demonstrable while leaving additional features for later development. The goal at first is just to have the MVP and possibly so more later.
+5. Functional Requirements:
+      Student Check-In
+          1. FR-1 The system shall allow an instructor to create a class attendance session.
+          2. FR-4 The system shall record the student's identity when a valid check-in is submitted.
+      Instructor Functions
+          3. FR-9 The system shall allow an instructor to view the attendance list for a class session.
+          4. FR-10 The system shall allow an authorized instructor to correct an attendance record.
+      Data Management
+          5. FR-14 The system shall store student records in the attendance database.
 
-6. Preliminary Technologies
-  The exact technologies may change during development. The team will prioritize tools that allow the core attendance workflow to be completed reliably within the project schedule.
-    Frontend: HTML, CSS, and JavaScript; React may be used for the interface.
-    Backend: Node.js with Express.js for application logic and APIs.
-    Database: PostgreSQL for students, sessions, and attendance records.
-    Check-In: QR-code generation and scanning.
-    Version Control: Git and GitHub.
+6. Non-Functional Requirements:
+      ID	Requirement	Measurement
+          1. NFR-1	Response Time	The system shall display a successful attendance confirmation within 2 seconds under normal classroom usage.
+          2. NFR-5	Data Accuracy	The system shall prevent duplicate attendance records for the same student and class session with 100% success during testing.
+          3. NFR-7	Usability	A student shall be able to complete a normal QR-code check-in in 30 seconds or less after opening the check-in screen.
 
-7. Initial Project Plan - The project will be divided between four students in the group based on their skills and strong suits:
-  Student 1 - Backend and Database: Build the database and API needed to create sessions and save attendance records.
-  Student 2 - QR Check-In: Build QR-code generation/scanning, validation, and duplicate check-in prevention.
-  Student 3 - User Interface: Build the student check-in screen and instructor session/attendance screens.
-  Student 4 - Testing and Integration: Test the complete workflow, document issues, and help integrate the components for the demonstration.
-
-During testing, we will simulate realistic classroom scenarios, including students checking in, duplicate attempts, late attendance, absences, and instructor corrections. Problems discovered during testing will be documented and fixed before the final demonstration. Light use of AI will be used to only enhance or polish this project, and not full creation, just as it was used for this proposal.
+7. Major Development Tasks:
+      Student 1 - Backend and Database: Build the database and API needed to create sessions and save attendance records.
+      Student 2 - QR Check-In: Build QR-code generation/scanning, validation, and duplicate check-in prevention.
+      Student 3 - User Interface: Build the student check-in screen and instructor session/attendance screens.
+      Student 4 - Testing and Integration: Test the complete workflow, document issues, and help integrate the components for the demonstration.
