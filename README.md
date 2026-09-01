@@ -17,19 +17,19 @@
 
 5. Functional Requirements:
       Student Check-In
-          1. FR-1 The system shall allow an instructor to create a class attendance session.
-          2. FR-4 The system shall record the student's identity when a valid check-in is submitted.
+          1. The system shall allow an instructor to create a class attendance session.
+          2. The system shall record the student's identity when a valid check-in is submitted.
       Instructor Functions
-          3. FR-9 The system shall allow an instructor to view the attendance list for a class session.
-          4. FR-10 The system shall allow an authorized instructor to correct an attendance record.
+          3. The system shall allow an instructor to view the attendance list for a class session.
+          4. The system shall allow an authorized instructor to correct an attendance record.
       Data Management
-          5. FR-14 The system shall store student records in the attendance database.
+          5. The system shall store student records in the attendance database.
 
 6. Non-Functional Requirements:
       ID	Requirement	Measurement
-          1. NFR-1	Response Time	The system shall display a successful attendance confirmation within 2 seconds under normal classroom usage.
-          2. NFR-5	Data Accuracy	The system shall prevent duplicate attendance records for the same student and class session with 100% success during testing.
-          3. NFR-7	Usability	A student shall be able to complete a normal QR-code check-in in 30 seconds or less after opening the check-in screen.
+          1. Response Time: The system shall display a successful attendance confirmation within 2 seconds under normal classroom usage.
+          2. Data Accuracy: The system shall prevent duplicate attendance records for the same student and class session with 100% success during testing.
+          3. Usability: A student shall be able to complete a normal QR-code check-in in 30 seconds or less after opening the check-in screen.
 
 7. Major Development Tasks:
       Student 1 - Backend and Database: Build the database and API needed to create sessions and save attendance records.
