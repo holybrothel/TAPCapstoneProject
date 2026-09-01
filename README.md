@@ -26,7 +26,7 @@
     Check-In: QR-code generation and scanning.
     Version Control: Git and GitHub.
 
-7. Initial Project Plan - The project will be divided between four students in the group based off of their like skills and strong suits:
+7. Initial Project Plan - The project will be divided between four students in the group based on their skills and strong suits:
   Student 1 - Backend and Database: Build the database and API needed to create sessions and save attendance records.
   Student 2 - QR Check-In: Build QR-code generation/scanning, validation, and duplicate check-in prevention.
   Student 3 - User Interface: Build the student check-in screen and instructor session/attendance screens.
