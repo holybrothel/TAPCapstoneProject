@@ -1,0 +1,458 @@
+T.A.P. — Tiger Attendance Portal
+Development Roadmap & Progress Log
+
+Project: Tiger Attendance Portal (T.A.P.)
+Current Phase: MVP Development
+Backend Developer: Kode
+Database: Tajah
+Frontend: Derrick
+Face Recognition / CompreFace: Novick
+
+---------------------Phase 1 — Project Planning and MVP Definition--------------------------
+
+The project initially began as a digital attendance system designed to replace traditional manual attendance methods. The original concept used QR codes to allow students to check into an active class session.
+
+After reviewing the concept with the professor, the team identified a major weakness in the QR-based approach: a QR code could potentially be shared with another student, allowing someone who was not physically present to receive attendance credit.
+
+Because preventing attendance fraud is one of the primary goals of T.A.P., the team decided to remove QR-code attendance from the system and redesign the identification process around facial recognition.
+
+    The revised MVP workflow became:
+
+        Instructor Creates Session
+                    ↓
+        Student Selects Active Session
+                    ↓
+        Student Captures Live Face Image
+                    ↓
+        Backend Receives Image
+                    ↓
+        Exadel CompreFace Performs Recognition
+                    ↓
+        Backend Verifies Student + Enrollment
+                    ↓
+        Duplicate Check
+                    ↓
+        Attendance Recorded in PostgreSQL
+                    ↓
+        Instructor Can View Attendance
+
+The team selected Exadel CompreFace as the open-source facial-recognition platform for the MVP.
+
+This change required revisions to the project's use-case model, system architecture, database design, backend responsibilities, and frontend requirements.
+
+--------------------------Phase 2 — System Architecture and Backend Planning-----------------------------
+
+Before beginning implementation, the backend responsibilities were separated from the facial-recognition service itself.
+
+The backend was designed around:
+
+Frontend
+   ↓
+Node.js / Express REST API
+   ↓
+Business Logic
+   ├────→ Exadel CompreFace
+   │
+   └────→ PostgreSQL
+
+A major architectural decision was to avoid tightly coupling the attendance system to CompreFace.
+
+Instead, facial recognition was isolated into:
+
+src/services/compreface.service.js
+
+This means the rest of T.A.P. only needs to request a recognition result rather than understanding how CompreFace internally processes an image.
+
+This also allows the backend, frontend, database, and facial-recognition components to be developed independently and integrated later.
+
+----------------------------Phase 3 — Backend Development Environment----------------------------------
+
+The backend development environment was established from scratch.
+
+Technologies Selected
+    Node.js
+    Express.js
+    PostgreSQL
+    JavaScript
+    REST API
+    Git / GitHub
+    Exadel CompreFace
+
+A structured backend project was created containing separate directories for:
+
+src/
+├── controllers/
+├── routes/
+├── services/
+├── middleware/
+├── models/
+└── config/
+
+database/
+├── migrations/
+└── seeds/
+
+docs/
+tests/
+uploads/
+
+Configuration files were also established for environment variables, Git exclusions, dependencies, database setup, and API documentation.
+
+This structure was intentionally created so multiple team members could contribute without having to modify the same files.
+
+-------------------------Phase 4 — Development Environment Problems and Solutions-------------------------------
+
+Several configuration issues were encountered while setting up the backend locally.
+
+    Problem 1 — npm Was Not Recognized
+
+        The first attempt to install project dependencies resulted in:
+
+        npm : The term 'npm' is not recognized
+    Cause
+
+        Node.js/npm had not yet been correctly installed or made available through the Windows PATH.
+
+    Resolution
+
+        Node.js was installed and the installation was verified with:
+
+            node --version
+            npm --version
+
+    Problem 2 — PowerShell Blocked npm
+
+        After Node.js became available, npm produced:
+
+            npm.ps1 cannot be loaded because running scripts is disabled on this system
+        Cause
+
+            Windows PowerShell's execution policy prevented the npm PowerShell script from running.
+
+        Resolution
+
+            The execution policy for the current Windows user was changed to:
+
+                Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+                After restarting the terminal, both Node and npm operated correctly.
+
+    Problem 3 — Dependency Warnings
+  
+          Running:
+
+              npm install
+
+              successfully installed approximately 205 packages, but npm reported several deprecated packages and security warnings.
+
+          The installation itself completed successfully.
+
+          Rather than blindly applying automatic dependency changes during initial configuration, the decision was made to first establish a stable development environment and then review/update affected dependencies deliberately.
+
+--------------------------Phase 5 — PostgreSQL Installation and Configuration--------------------------------
+
+PostgreSQL was selected as the relational database for T.A.P.
+
+During installation:
+
+Port: 5432
+Database administrator: postgres
+Password: locally configured
+
+The default PostgreSQL port of 5432 was retained.
+
+Optional Stack Builder packages were not installed because they were unnecessary for the MVP.
+
+Problem — psql Was Not Recognized
+
+PostgreSQL installed successfully, but:
+
+psql --version
+
+initially returned:
+
+The term 'psql' is not recognized
+
+PostgreSQL itself was functional; Windows simply did not know where the command-line executable was located.
+
+Resolution
+
+The PostgreSQL binary directory was added to the Windows PATH:
+
+C:\Program Files\PostgreSQL\18\bin
+
+After restarting VS Code:
+
+psql --version
+
+successfully returned PostgreSQL 18.6.
+
+The database server was then accessed using:
+
+psql -U postgres
+
+and the project's development database was created:
+
+CREATE DATABASE tap;
+
+----------------------Phase 6 — Database Schema Implementation--------------------------
+
+Instead of manually creating database tables, SQL migrations were created so every team member can reproduce the same database structure.
+
+Six initial migrations were implemented:
+
+001_create_users.sql
+002_create_courses.sql
+003_create_enrollments.sql
+004_create_class_sessions.sql
+005_create_face_profiles.sql
+006_create_attendance_records.sql
+
+These migrations created the primary MVP entities:
+
+users
+courses
+enrollments
+class_sessions
+face_profiles
+attendance_records
+
+A particularly important database rule was established for attendance:
+
+UNIQUE(student_id, session_id)
+
+This provides database-level protection against a student receiving multiple attendance records for the same class session.
+
+Face recognition references are separated into face_profiles, allowing T.A.P. to associate a student with the recognition system without requiring attendance records themselves to contain biometric data.
+
+---------------------Phase 7 — Database Migration Issue---------------------------
+
+The first attempt to execute:
+
+npm run db:migrate
+
+failed because the terminal was currently located at:
+
+C:\WINDOWS\system32
+
+npm therefore attempted to locate:
+
+C:\WINDOWS\system32\package.json
+
+and produced an ENOENT error.
+
+Resolution
+
+The terminal was moved into the actual project directory:
+
+cd "C:\Users\kode P\Downloads\TAP-Backend-DRAFT-V1\TAP-Backend-Starter"
+
+The migration command was executed again.
+
+All six migrations completed successfully:
+
+Running migration: 001_create_users.sql
+Running migration: 002_create_courses.sql
+Running migration: 003_create_enrollments.sql
+Running migration: 004_create_class_sessions.sql
+Running migration: 005_create_face_profiles.sql
+Running migration: 006_create_attendance_records.sql
+
+Migrations complete
+
+This established the first working T.A.P. database schema.
+
+--------------------Phase 8 — Development/Test Data------------------------------
+
+Seed scripts were incorporated into the backend so the system could be tested before real users were available.
+
+The development environment includes a test:
+
+Instructor
+Student
+Course
+Enrollment
+Active Class Session
+
+The mock facial-recognition system is configured to recognize the development student.
+
+This allows the entire attendance workflow to be developed before the real CompreFace integration is completed.
+
+-------------------Phase 9 — Express Backend Successfully Launched-----------------------
+
+The Express development server was started with:
+
+npm run dev
+
+The server successfully connected to PostgreSQL:
+
+PostgreSQL connected
+T.A.P. backend running on http://localhost:3000
+
+The first API endpoint was then tested through:
+
+GET /api/health
+
+and successfully returned:
+
+{
+    "success": true,
+    "message": "T.A.P. backend is running"
+}
+
+Additional database-backed endpoints were prepared for courses, students, sessions, attendance, and facial-recognition check-in.
+
+At this stage, the project had progressed beyond architecture/design and reached a functioning backend development environment with an operational REST API and PostgreSQL connection.
+
+--------------------Phase 10 — Parallel Development Strategy------------------------
+
+A major objective during backend development was preventing one team member's unfinished component from blocking the other developers.
+
+A mock facial-recognition implementation was therefore introduced.
+
+Currently:
+
+Student Image
+     ↓
+Backend
+     ↓
+Mock Recognition
+     ↓
+Test Student Identified
+     ↓
+Enrollment Validation
+     ↓
+Duplicate Validation
+     ↓
+Attendance Record
+
+Later, only the recognition component needs to change:
+
+Student Image
+     ↓
+Backend
+     ↓
+REAL CompreFace
+     ↓
+Student Identified
+     ↓
+Enrollment Validation
+     ↓
+Duplicate Validation
+     ↓
+Attendance Record
+
+This allows the attendance logic and frontend integration to be tested before the real facial-recognition implementation is complete.
+
+Phase 11 — Team Delegation and Development Handoff
+
+After establishing the backend foundation, responsibilities and immediate development tasks were clarified for the other three team members.
+
+-----------------Tajah — Database Development------------------
+
+Tajah was assigned responsibility for reviewing and continuing development of the PostgreSQL database.
+
+The initial schema and migration framework have already been created, allowing her to begin with an operational foundation rather than starting from scratch.
+
+Her immediate responsibilities include reviewing the six tables, validating relationships and constraints, improving the database structure where necessary, and ensuring attendance data can be stored and retrieved reliably.
+
+------------------Derrick — Frontend Development----------------
+
+Derrick can begin developing the student and instructor interfaces without waiting for facial recognition to be completed.
+
+The API contract provides the expected backend routes and response formats.
+
+His immediate work includes:
+
+Student Interface
+→ Select class/session
+→ Access webcam
+→ Capture face
+→ Submit check-in
+→ Display success/error
+
+Instructor Interface
+→ Create session
+→ View enrolled students
+→ View attendance
+
+Because the backend currently supports mock recognition, Derrick can eventually connect his real interface to the backend before CompreFace is finished.
+
+----------------------Novick — Facial Recognition / CompreFace--------------------------
+
+Novick was assigned the facial-recognition integration.
+
+Rather than requiring him to understand or modify the entire backend, CompreFace-specific functionality was isolated into:
+
+src/services/compreface.service.js
+
+His primary goal is straightforward:
+
+Enroll Student Face
+        ↓
+Store/Associate CompreFace Subject
+        ↓
+Receive New Face Image
+        ↓
+Send Image to CompreFace
+        ↓
+Receive Recognition Result
+        ↓
+Return Identity + Confidence to Backend
+
+Once this is operational, the mock recognition implementation can be replaced with the real service.
+
+-----------------Current Project Status — September 7, 2026----------------------
+Component	Status
+Project concept                     ✅ Complete
+MVP definition                      ✅ Complete
+QR → facial recognition redesign    ✅ Complete
+Use-case design                     ✅ Complete
+System architecture                 ✅ Complete
+Backend folder architecture         ✅ Complete
+Node.js development environment     ✅ Working
+Express server                      ✅ Working
+PostgreSQL installation             ✅ Working
+tap development database            ✅ Created
+Database migrations                 ✅ Working
+Development seed system             ✅ Implemented
+PostgreSQL → Express connection     ✅ Working
+Health API                          ✅ Tested
+API contract                        ✅ Initial version
+Mock facial recognition             ✅ Implemented
+Database refinement                 🟡 In progress — Tajah
+Frontend UI                         🟡 Beginning — Derrick
+Real CompreFace integration         🟡 Beginning — Novick
+Full system integration	            ⬜ Upcoming
+MVP testing                         ⬜ Upcoming
+Final deployment                    ⬜ Future / stretch
+
+--------------Backend Contribution Summary----------------------
+
+My primary contribution during this development period was establishing the technical foundation that allows the different parts of T.A.P. to be developed simultaneously.
+
+I designed and implemented the initial Node.js/Express backend structure, established the PostgreSQL connection, implemented repeatable SQL migrations and development seed data, defined the initial REST API structure, established duplicate-attendance protection, separated facial recognition from the core attendance logic, and successfully brought the backend server online.
+
+During implementation, I also diagnosed and resolved several development-environment problems involving Node/npm installation, Windows PowerShell execution policies, PostgreSQL command-line PATH configuration, project-directory errors, and database migration execution.
+
+Beyond implementation, I helped divide the system into clear development responsibilities so that the database, frontend, and facial-recognition portions of the project can now proceed independently. The backend was intentionally structured around defined interfaces and mock recognition so that unfinished components do not prevent other team members from making progress.
+
+--------------Next Development Milestone------------------------
+
+The next major milestone is component integration.
+
+The goal is to reach:
+
+Real Frontend
+      ↓
+Express API
+      ↓
+Real CompreFace
+      ↓
+PostgreSQL
+      ↓
+Attendance Successfully Recorded
+      ↓
+Instructor Attendance View
+
+Once this complete workflow operates successfully, the team will have achieved the central functionality of the T.A.P. MVP.
