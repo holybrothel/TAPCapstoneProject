@@ -6,227 +6,635 @@
 
 **T.A.P. (Tiger Attendance Portal)** is a student attendance management system designed to make classroom attendance faster, more accurate, and easier for instructors to manage.
 
-The system provides a complete attendance workflow where an instructor creates a class session and generates a QR code. Students scan the QR code to check in, and T.A.P. automatically records the student, class session, and check-in time. Instructors can then review the attendance list through an instructor dashboard.
+T.A.P. uses **facial recognition** to verify a student's identity before recording attendance. Instead of relying on transferable methods such as QR codes, a student submits a live face capture during an active class session. The system verifies the student's identity using **Exadel CompreFace**, confirms that the student is enrolled in the course, checks for an existing attendance record, and records the successful check-in.
+
+Instructors can create class sessions, manage enrolled students, review attendance records, and make authorized attendance corrections when necessary.
+
+---
 
 ## Problem Statement
 
-Traditional manual attendance methods can take valuable class time and may result in inaccurate attendance records. Students may be marked incorrectly, and manual methods can make it possible for one student to check in for another.
+Traditional attendance methods can consume valuable class time and may produce inaccurate records. Manual attendance can result in students being marked incorrectly, while simple digital check-in methods can still allow one student to check in on behalf of another.
 
-T.A.P. addresses these problems by providing a centralized digital attendance system with QR-code check-in, duplicate detection, instructor attendance management, and reporting capabilities.
+T.A.P. addresses these problems by providing a centralized digital attendance system that combines:
 
-## Project Objectives
+- Facial-recognition identity verification
+- Course enrollment validation
+- Active class-session validation
+- Duplicate check-in prevention
+- Automatic attendance recording
+- Instructor attendance management
 
-The project aims to:
+The goal is to provide a more reliable method of determining whether the correct student is checking into a class session.
 
-* Develop a working attendance database for students, courses, class sessions, and attendance records.
-* Implement QR-code attendance check-in.
-* Prevent duplicate attendance check-ins.
-* Provide a manual check-in fallback option.
-* Provide an instructor dashboard for managing class sessions and attendance.
-* Allow authorized instructors to correct attendance records.
-* Provide attendance reporting and export functionality.
-* Test the system for accuracy, usability, privacy, and reliability.
+---
 
-## Main Features
+## MVP
 
-### 1. QR Code Attendance Check-In
+The current project is focused on delivering a **Minimum Viable Product (MVP)** that demonstrates one complete attendance workflow.
 
-Instructors can generate a QR code for an active class session. Students scan the QR code to submit their attendance.
+The MVP must allow:
 
-### 2. Class Session Management
+1. An instructor to create a class session.
+2. Students to be associated with their enrolled courses.
+3. A student to select an active class session.
+4. A student to capture and submit a face image.
+5. T.A.P. to send the image to Exadel CompreFace for recognition.
+6. The backend to verify the recognized student's enrollment.
+7. The system to prevent duplicate attendance.
+8. The system to record a successful attendance check-in.
+9. An instructor to review the attendance list.
 
-Instructors can create attendance sessions for their classes and generate a unique QR code for each session.
+Additional reporting, analytics, deployment, and advanced security features may be developed after the core MVP is stable.
 
-### 3. Automatic Attendance Records
+---
 
-When a student successfully checks in, the system records:
+# System Architecture
 
-* Student
-* Course/class session
-* Check-in date
-* Check-in time
+T.A.P. is being developed as a web-based system with separate frontend, backend, database, and facial-recognition components.
 
-### 4. Instructor Dashboard
+```text
+              STUDENT / INSTRUCTOR
+                       │
+                       ▼
+              Frontend Web Application
+              HTML / CSS / JavaScript
+                     React
+                       │
+                       │ REST API
+                       ▼
+               Node.js + Express
+                 T.A.P. Backend
+                  /          \
+                 /            \
+                ▼              ▼
+        PostgreSQL        Exadel CompreFace
+          Database         Face Recognition
+```
 
-Instructors can review attendance for active and previous class sessions and make authorized corrections when necessary.
+The backend serves as the central connection between the user interface, PostgreSQL database, and facial-recognition service.
 
-### 5. Attendance Reports & Export
+---
 
-Instructors can review attendance information and generate useful attendance reports.
-
-## Functional Requirements
-
-The system shall:
-
-* **FR-1:** Allow an instructor to create a class attendance session.
-* **FR-2:** Generate a unique QR code for an active class session.
-* **FR-3:** Allow a student to scan the QR code for an active class session.
-* **FR-4:** Record the student's identity when a valid check-in is submitted.
-* **FR-5:** Record the class session associated with each attendance check-in.
-* **FR-6:** Record the date and time of each attendance check-in.
-* **FR-7:** Prevent a student from submitting more than one attendance check-in for the same class session.
-* **FR-8:** Provide a manual attendance option when QR-code check-in cannot be used.
-* **FR-9:** Allow an instructor to view the attendance list for a class session.
-* **FR-10:** Allow an authorized instructor to correct an attendance record.
-* **FR-11:** Allow an instructor to review attendance records for previous class sessions.
-* **FR-12:** Allow an instructor to generate an attendance report.
-* **FR-13:** Allow an instructor to export attendance information.
-* **FR-14:** Store student records in the attendance database.
-* **FR-15:** Store course and class-session records in the attendance database.
-* **FR-16:** Associate each attendance record with a student and class session.
-
-## Non-Functional Requirements
-
-| ID        | Requirement          | Target                                                                                                                 |
-| --------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **NFR-1** | Response Time        | Successful attendance confirmation shall be displayed within **2 seconds** under normal classroom usage.               |
-| **NFR-2** | Concurrent Users     | The system shall support at least **100 simultaneous students** attempting to check in.                                |
-| **NFR-3** | Availability         | The system shall maintain at least **99% availability** during scheduled classroom testing.                            |
-| **NFR-4** | Password Security    | User credentials shall be stored using **hashed and salted passwords**.                                                |
-| **NFR-5** | Duplicate Prevention | The system shall prevent duplicate attendance records with **100% success during testing**.                            |
-| **NFR-6** | Check-In Reliability | The system shall successfully record at least **99% of valid check-in attempts** during controlled testing.            |
-| **NFR-7** | Usability            | A student shall be able to complete a normal QR-code check-in within **30 seconds** after opening the check-in screen. |
-
-## Technology Stack
-
-The exact technologies may change during development. The current proposed technology stack is:
-
-### Frontend
-
-* HTML
-* CSS
-* JavaScript
-* React *(may be used)*
-
-### Backend
-
-* Node.js
-* Express.js
-
-### Database
-
-* PostgreSQL
-
-### Attendance
-
-* QR-code generation
-* QR-code scanning
-
-### Version Control
-
-* Git
-* GitHub
-
-## System Workflow
+## Attendance Workflow
 
 The primary MVP workflow is:
 
 ```text
 Instructor creates class session
-            ↓
-     System generates QR code
-            ↓
-       Student scans QR
-            ↓
-     System validates check-in
-            ↓
-      Attendance is recorded
-            ↓
-    Instructor reviews attendance
-            ↓
-   Report can be generated/exported
+              ↓
+Student selects active session
+              ↓
+Student captures live face image
+              ↓
+Frontend sends image to backend
+              ↓
+Backend sends image to CompreFace
+              ↓
+CompreFace attempts to recognize student
+              ↓
+Backend receives recognition result
+              ↓
+System verifies course enrollment
+              ↓
+System checks for duplicate attendance
+              ↓
+Attendance record is created
+              ↓
+Student receives confirmation
+              ↓
+Instructor can view attendance
 ```
-
-The goal of the MVP is to demonstrate one complete attendance workflow from session creation through instructor review.
-
-## Major Development Tasks
-
-### 1. Backend & Database
-
-* Design the PostgreSQL database.
-* Create student, course, session, and attendance tables.
-* Develop APIs for creating sessions.
-* Develop APIs for recording attendance.
-* Develop APIs for retrieving attendance records.
-* Connect the backend to the database.
-
-### 2. QR Code Check-In
-
-* Implement QR-code generation.
-* Implement QR-code scanning.
-* Validate QR codes against active sessions.
-* Prevent duplicate check-ins.
-* Implement the manual check-in fallback.
-
-### 3. User Interface
-
-* Build the student check-in screen.
-* Build the instructor session creation screen.
-* Build the instructor attendance dashboard.
-* Display attendance records.
-* Provide authorized attendance correction controls.
-
-### 4. Reporting & Export
-
-* Build attendance report views.
-* Add attendance information filtering/review.
-* Implement attendance data export.
-* Verify exported information against stored attendance records.
-
-### 5. Testing & Integration
-
-* Test the complete attendance workflow.
-* Test duplicate check-ins.
-* Test invalid or expired QR codes.
-* Test late attendance.
-* Test absences.
-* Test instructor corrections.
-* Test the manual check-in option.
-* Document and fix issues.
-* Integrate all components for the final demonstration.
-
-## Team
-
-| Team Member            | Primary Responsibility    |
-| ---------------------- | ------------------------- |
-| **Efrem (Coda) Black** | Team member / development |
-| **Tajah Refuge**       | Team member / development |
-| **Novick Dragnire**    | Team member / development |
-| **Derrick Ellis**      | Team member / development |
-
-The original project plan divides the development work into backend/database, QR check-in, user interface, and testing/integration responsibilities.
-
-## Testing
-
-Testing will simulate realistic classroom scenarios, including:
-
-* Normal student check-ins
-* Duplicate check-in attempts
-* Late attendance
-* Student absences
-* Instructor attendance corrections
-* QR-code failures
-* Manual attendance fallback
-* Complete end-to-end attendance workflow
-
-Problems discovered during testing will be documented and corrected before the final demonstration.
-
-## Project Goal
-
-The primary goal of T.A.P. is to deliver a **working, functional MVP** that demonstrates a reliable digital attendance process:
-
-> **Create a session → Generate QR code → Student checks in → Attendance is recorded → Instructor reviews the result**
-
-Future development can expand the system after the core MVP has been successfully completed.
-
-## Project Status
-
-**Status:** 🚧 In Development
-
-**Current Focus:** MVP attendance workflow, database, QR-code check-in, instructor dashboard, and testing.
 
 ---
 
-### Team Repository
+# Project Objectives
 
-This repository contains the source code, documentation, requirements, and development work for the **T.A.P. — Tiger Attendance Portal** project.
+The project aims to:
+
+- Develop a working database for users, courses, enrollments, class sessions, face profiles, and attendance records.
+- Implement facial-recognition attendance verification using Exadel CompreFace.
+- Verify that a recognized student is enrolled in the selected course.
+- Prevent duplicate attendance check-ins.
+- Automatically record successful attendance.
+- Provide an instructor interface for creating class sessions.
+- Provide an instructor interface for viewing attendance.
+- Allow authorized attendance corrections when necessary.
+- Test the system for accuracy, reliability, usability, and privacy.
+- Integrate the frontend, backend, database, and facial-recognition components into one functional MVP.
+
+---
+
+# Core Features
+
+## 1. Facial Recognition Check-In
+
+Students submit a face capture when checking into an active class session.
+
+The backend communicates with **Exadel CompreFace** to determine whether the submitted face matches an enrolled identity.
+
+---
+
+## 2. Class Session Management
+
+Instructors can create attendance sessions associated with their courses.
+
+Sessions can have states such as:
+
+- `scheduled`
+- `active`
+- `closed`
+
+Normal student check-ins are only accepted for active sessions.
+
+---
+
+## 3. Enrollment Validation
+
+Recognizing a student is not enough to receive attendance credit.
+
+After recognition, T.A.P. verifies that the identified student is currently enrolled in the course associated with the class session.
+
+---
+
+## 4. Duplicate Check-In Prevention
+
+T.A.P. prevents the same student from receiving multiple attendance records for the same class session.
+
+Duplicate protection is enforced at both the application and database levels.
+
+The database uses the constraint:
+
+```sql
+UNIQUE(student_id, session_id)
+```
+
+---
+
+## 5. Automatic Attendance Recording
+
+After a successful verification, T.A.P. records information including:
+
+- Student
+- Class session
+- Check-in time
+- Verification status
+- Recognition confidence score, when available
+
+---
+
+## 6. Instructor Attendance Management
+
+Instructors will be able to:
+
+- Create class sessions
+- View enrolled students
+- View attendance records
+- Review previous class sessions
+- Make authorized attendance corrections when necessary
+
+---
+
+# Functional Requirements
+
+The current MVP functional requirements include:
+
+- **FR-1:** Allow an instructor to create a class attendance session.
+- **FR-2:** Allow a student to view/select an available class session.
+- **FR-3:** Allow a student to capture and submit a face image for attendance verification.
+- **FR-4:** Submit the captured image to the facial-recognition service.
+- **FR-5:** Determine whether the submitted face matches a registered student.
+- **FR-6:** Verify that the recognized student is enrolled in the course.
+- **FR-7:** Verify that the selected class session is active.
+- **FR-8:** Record the recognized student's identity for a successful check-in.
+- **FR-9:** Record the class session associated with the check-in.
+- **FR-10:** Record the date and time of the attendance check-in.
+- **FR-11:** Prevent a student from receiving more than one attendance record for the same class session.
+- **FR-12:** Allow an instructor to view the attendance list for a class session.
+- **FR-13:** Allow an authorized instructor to correct an attendance record.
+- **FR-14:** Store student and instructor information in the system database.
+- **FR-15:** Store course and class-session information.
+- **FR-16:** Store course enrollment information.
+- **FR-17:** Associate each attendance record with a student and class session.
+- **FR-18:** Associate registered students with the facial-recognition system.
+
+---
+
+# Non-Functional Requirements
+
+| ID | Requirement | Current Target |
+|---|---|---|
+| **NFR-1** | Performance | Attendance verification should complete within a reasonable period under normal classroom conditions. |
+| **NFR-2** | Concurrent Usage | The system should support multiple students attempting to check in during the same class session. |
+| **NFR-3** | Password Security | User credentials shall be stored using secure password hashing. |
+| **NFR-4** | Duplicate Prevention | The system shall prevent duplicate attendance records for the same student and session. |
+| **NFR-5** | Reliability | Valid attendance records should be stored consistently without data loss during controlled testing. |
+| **NFR-6** | Usability | A student should be able to complete the normal attendance process without unnecessary steps. |
+| **NFR-7** | Privacy | Access to student, attendance, and facial-recognition information shall be limited to authorized system components and users. |
+| **NFR-8** | Maintainability | Backend, database, frontend, and facial-recognition functionality should remain modular to allow independent development and testing. |
+
+> Performance and reliability targets will be refined after integration testing provides measurable results.
+
+---
+
+# Technology Stack
+
+## Frontend
+
+- HTML
+- CSS
+- JavaScript
+- React
+
+## Backend
+
+- Node.js
+- Express.js
+- REST API
+
+## Database
+
+- PostgreSQL
+- SQL migrations
+- Development seed data
+
+## Facial Recognition
+
+- Exadel CompreFace
+- Image-based face recognition
+- Facial identity/subject association
+- Recognition confidence results
+
+## Development & Version Control
+
+- Visual Studio Code
+- Git
+- GitHub
+- npm
+- Nodemon
+
+---
+
+# Backend Structure
+
+The backend follows a modular structure:
+
+```text
+backend/
+│
+├── database/
+│   ├── migrations/
+│   └── seeds/
+│
+├── docs/
+│
+├── src/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   │   └── compreface.service.js
+│   ├── app.js
+│   └── server.js
+│
+├── tests/
+├── uploads/
+├── .env.example
+├── .gitignore
+└── package.json
+```
+
+The architecture separates database access, API routes, business logic, and facial-recognition integration so team members can work on different components independently.
+
+---
+
+# Database
+
+The initial PostgreSQL schema contains six primary tables:
+
+```text
+users
+courses
+enrollments
+class_sessions
+face_profiles
+attendance_records
+```
+
+### Major Relationships
+
+```text
+Instructor
+    │
+    └── Course
+          │
+          ├── Enrollments ── Students
+          │
+          └── Class Sessions
+                    │
+                    └── Attendance Records
+                              │
+                              └── Student
+
+Student
+    │
+    └── Face Profile
+```
+
+The `face_profiles` table connects a T.A.P. student account with the identity/subject used by the facial-recognition service.
+
+---
+
+# API
+
+The backend exposes REST API endpoints for the frontend and other project components.
+
+Current/planned endpoints include:
+
+```text
+GET    /api/health
+
+GET    /api/courses
+GET    /api/courses/:courseId
+
+GET    /api/courses/:courseId/students
+POST   /api/courses/:courseId/enrollments
+
+GET    /api/courses/:courseId/sessions
+POST   /api/courses/:courseId/sessions
+
+GET    /api/sessions/:sessionId
+
+POST   /api/sessions/:sessionId/check-in
+GET    /api/sessions/:sessionId/attendance
+
+POST   /api/students/:studentId/face/enroll
+```
+
+Detailed request and response information is maintained in the project's API documentation.
+
+---
+
+# Facial Recognition Integration
+
+Facial-recognition functionality is intentionally isolated from the main attendance logic.
+
+The integration is located in:
+
+```text
+src/services/compreface.service.js
+```
+
+The goal is for the rest of the backend to interact with a simplified interface such as:
+
+```javascript
+recognizeFace(image)
+```
+
+rather than depending directly on CompreFace's internal response structure.
+
+Conceptually:
+
+```text
+Captured Image
+      ↓
+CompreFace Service
+      ↓
+Recognition Result
+      ↓
+Student Identity / Subject
+      ↓
+Confidence Score
+      ↓
+T.A.P. Attendance Logic
+```
+
+During development, mock recognition can be used so that frontend, backend, database, and testing work can continue before the real CompreFace integration is complete.
+
+---
+
+# Major Development Areas
+
+## Backend
+
+- Express server
+- REST API
+- PostgreSQL connectivity
+- Session validation
+- Enrollment validation
+- Duplicate prevention
+- Attendance recording
+- CompreFace service integration
+- Authentication and authorization
+
+## Database
+
+- Database schema
+- Table relationships
+- Constraints
+- SQL migrations
+- Development seed data
+- Attendance integrity
+- Face-profile association
+
+## Frontend
+
+### Student Interface
+
+- Login
+- View/select class session
+- Webcam access
+- Face capture
+- Submit check-in
+- Display check-in confirmation/errors
+
+### Instructor Interface
+
+- Login
+- Create class session
+- View/manage enrolled students
+- View attendance
+- Correct attendance when authorized
+
+## Facial Recognition
+
+- Run/configure Exadel CompreFace
+- Register student identities
+- Enroll reference face data
+- Submit captured images for recognition
+- Process recognition results
+- Return identity and confidence information to T.A.P.
+
+## Testing & Integration
+
+- Valid student check-in
+- Unrecognized face
+- Student not enrolled in course
+- Inactive class session
+- Duplicate check-in
+- Missing/invalid image
+- Instructor attendance retrieval
+- Attendance corrections
+- Complete end-to-end workflow
+
+---
+
+# Team
+
+| Team Member | Primary Responsibility |
+|---|---|
+| **Efrem (Coda) Black** | Backend Development / System Integration |
+| **Tajah Refuge** | PostgreSQL Database |
+| **Derrick Ellis** | Frontend Design & Development |
+| **Novick Dragnire** | Exadel CompreFace / Facial Recognition |
+
+### Development Responsibilities
+
+**Backend / System Integration — Efrem (Coda)**
+
+Responsible for establishing the Node.js/Express backend, REST API structure, PostgreSQL connectivity, attendance business logic, development environment, and integration points between project components.
+
+**Database — Tajah**
+
+Responsible for reviewing and refining the PostgreSQL schema, relationships, constraints, migrations, and data-storage requirements.
+
+**Frontend — Derrick**
+
+Responsible for developing the student and instructor interfaces and connecting the user interface to the backend REST API.
+
+**Facial Recognition — Novick**
+
+Responsible for configuring Exadel CompreFace and implementing student face enrollment and recognition functionality through the backend's CompreFace service.
+
+The project is structured so these components can be developed in parallel and integrated as development progresses.
+
+---
+
+# Testing
+
+Testing will include realistic classroom and system scenarios such as:
+
+- Successful facial-recognition check-in
+- Unrecognized face
+- Recognized student who is not enrolled in the selected course
+- Duplicate check-in attempt
+- Check-in attempt for an inactive class session
+- Missing or invalid face image
+- Student absence
+- Late attendance
+- Instructor attendance review
+- Authorized attendance correction
+- Database integrity
+- Complete end-to-end attendance workflow
+
+Problems discovered during development and testing will be documented in the project's progress log and corrected as the MVP develops.
+
+---
+
+# Current Development Progress
+
+The project has moved from system planning into active MVP development.
+
+### Completed / Operational
+
+- [x] Initial project concept
+- [x] MVP definition
+- [x] Transition from QR-based attendance to facial recognition
+- [x] High-level system architecture
+- [x] Use-case planning
+- [x] Initial database design
+- [x] Backend project structure
+- [x] Node.js / Express development environment
+- [x] PostgreSQL development database
+- [x] PostgreSQL connection from backend
+- [x] SQL migration system
+- [x] Initial database migrations
+- [x] Development seed-data system
+- [x] REST API foundation
+- [x] Backend health endpoint
+- [x] Mock facial-recognition interface
+- [x] Initial API documentation
+
+### In Progress
+
+- [ ] Database refinement and testing
+- [ ] Student frontend
+- [ ] Instructor frontend
+- [ ] Real Exadel CompreFace integration
+- [ ] Face enrollment workflow
+- [ ] Authentication and authorization
+- [ ] Full attendance check-in integration
+
+### Future / Stretch Goals
+
+- [ ] Advanced attendance reports
+- [ ] Attendance export
+- [ ] Attendance analytics
+- [ ] Audit logging
+- [ ] Additional anti-spoofing/liveness protections
+- [ ] Production deployment
+
+---
+
+# Project Roadmap
+
+```text
+Planning & Requirements
+          │
+          ▼
+MVP Definition
+          │
+          ▼
+System Architecture
+          │
+          ▼
+Backend + Database Foundation
+          │
+          ▼
+Parallel Component Development
+     ┌────┼────────────┐
+     ▼    ▼            ▼
+ Database Frontend   CompreFace
+     └────┼────────────┘
+          ▼
+     Integration
+          │
+          ▼
+    End-to-End MVP
+          │
+          ▼
+       Testing
+          │
+          ▼
+   Final Demonstration
+```
+
+Development decisions, implementation progress, encountered problems, and solutions are maintained in the project's **Progress Log**.
+
+---
+
+# Project Goal
+
+The primary goal of T.A.P. is to deliver a **working and demonstrable attendance MVP**:
+
+> **Create Session → Student Face Capture → Facial Recognition → Verify Enrollment → Prevent Duplicate → Record Attendance → Instructor Reviews Result**
+
+The MVP prioritizes completing this core workflow before additional features are added.
+
+---
+
+# Project Status
+
+**Status:** 🚧 In Development
+
+**Current Phase:** Backend/database foundation completed; parallel frontend, database, and CompreFace development beginning.
+
+**Current Focus:** Connecting the database, frontend, and real facial-recognition components to produce the first complete end-to-end attendance check-in.
+
+---
+
+## Team Repository
+
+This repository contains the source code, documentation, requirements, development history, and implementation work for the **T.A.P. — Tiger Attendance Portal** capstone project.
