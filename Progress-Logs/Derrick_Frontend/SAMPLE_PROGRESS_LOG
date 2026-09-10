@@ -1,1 +1,120 @@
-INPUT YOUR PROGRESS LOGS IN THIS FOLDER
+Frontend Progress Log - Derrick Ellis
+
+Role: Frontend Developer
+Project: T.A.P. - Tiger Attendance Portal
+
+==================================================
+PROGRESS COMPLETED
+==================================================
+
+1. Frontend Setup
+- Set up the frontend files inside TAP-Resources/frontend.
+- Created separate interfaces for students and instructors.
+- Used HTML, CSS, and JavaScript for the frontend.
+- Connected frontend functions to the backend API structure.
+
+2. Login Interface
+- Created the T.A.P. login page.
+- Added email and password input fields.
+- Added Student and Instructor role selection.
+- Added navigation to the appropriate dashboard based on the selected role.
+
+3. Student Dashboard
+- Created the student attendance dashboard.
+- Added course selection.
+- Added class session selection.
+- Added webcam access for attendance verification.
+- Added image capture for face-recognition check-in.
+- Connected the check-in function to the backend API.
+- Added success and error messages for attendance check-in.
+
+4. Instructor Dashboard
+- Created the instructor dashboard.
+- Added course and class session management.
+- Added a Create Class Session form.
+- Added session name, start time, end time, and location fields.
+- Added validation to prevent incomplete session information.
+- Added validation to make sure the session end time is after the start time.
+- Added enrolled student roster.
+- Added student search functionality.
+- Added attendance records table.
+- Added Present and Not Checked In attendance statuses.
+- Added dashboard statistics for active sessions, enrolled students, and attendance.
+
+5. User Interface Design
+- Created a maroon T.A.P. theme for the application.
+- Added dashboard cards, navigation, buttons, forms, and status indicators.
+- Added responsive styling for different screen sizes.
+- Added a scrollable student roster to handle larger class sizes.
+- Added mock student information for frontend testing.
+
+6. Backend Integration
+- Used the backend API endpoints provided by the team.
+- Added frontend requests for courses and class sessions.
+- Added frontend requests for enrolled students.
+- Added frontend requests for attendance records.
+- Added POST request functionality for creating class sessions.
+- Added POST request functionality for student face check-in.
+- Added error handling when the frontend cannot connect to the backend.
+
+7. Testing
+- Tested the login interface.
+- Tested navigation between student and instructor interfaces.
+- Tested the Create Session form.
+- Tested form validation and success/error messages.
+- Tested the student roster and search interface.
+- Tested the webcam/check-in interface.
+- Used mock data while the full backend and face-recognition system are still being developed.
+
+8. GitHub / Version Control
+- Created the derrick-frontend Git branch.
+- Committed the student and instructor frontend files.
+- Pushed the frontend branch to GitHub.
+- Created a pull request to merge the frontend into main.
+- Fixed the GitHub Actions workflow so the backend package directory could be located.
+- Verified GitHub Actions using Node.js 18.x, 20.x, and 22.x.
+- All three GitHub Actions checks passed.
+- Merged the frontend work into the main branch.
+
+==================================================
+FRONTEND FILES
+==================================================
+
+index.html
+- Main T.A.P. login page.
+
+script.js
+- Controls login and role-based navigation.
+
+student.html
+- Contains the student dashboard interface.
+
+student.js
+- Controls course/session selection, webcam capture, and attendance check-in.
+
+instructor.html
+- Contains the instructor dashboard interface.
+
+instructor.js
+- Controls session creation, student roster, attendance information, and backend API requests.
+
+style.css
+- Contains the styling and responsive design for the T.A.P. frontend.
+
+==================================================
+CURRENT STATUS
+==================================================
+
+The main student and instructor frontend interfaces are complete.
+The frontend has been uploaded and merged into the GitHub repository.
+The interfaces are prepared to work with the team's backend and face-recognition components as those components are completed.
+
+==================================================
+NEXT STEPS
+==================================================
+
+- Continue testing frontend and backend integration.
+- Replace remaining mock data with live database information.
+- Test face-recognition attendance with the completed CompreFace service.
+- Make any interface changes required after full team integration.
+- Continue testing for errors and usability issues.
