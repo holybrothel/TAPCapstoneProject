@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>T.A.P. | Student Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+                <div class="logo">T</div>
+
+                <div>
+                    <h2>T.A.P.</h2>
+                    <p>Student Portal</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active">
+                    <span>⌂</span>
+                    Dashboard
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>✓</span>
+                    Check In
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>▦</span>
+                    Attendance
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="student-mini-profile">
+                    <div class="profile-avatar">DE</div>
+
+                    <div>
+                        <strong>Derrick Ellis</strong>
+                        <p>Student</p>
+                    </div>
+                </div>
+
+                <button class="logout-button" id="logout-button">
+                    Log Out
+                </button>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-main">
+
+            <!-- TOP BAR -->
+            <header class="dashboard-header">
+
+                <div>
+                    <p class="dashboard-label">STUDENT DASHBOARD</p>
+                    <h1>Welcome back, Derrick.</h1>
+                    <p class="dashboard-subtext">
+                        Select your class and active session to check in.
+                    </p>
+                </div>
+
+                <div class="header-status">
+                    <span class="status-dot"></span>
+                    System Online
+                </div>
+
+            </header>
+
+
+            <!-- QUICK STATS -->
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div>
+                        <p>Today's Classes</p>
+                        <h3>3</h3>
+                    </div>
+
+                    <div class="stat-icon">▦</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <p>Attendance Rate</p>
+                        <h3>96%</h3>
+                    </div>
+
+                    <div class="stat-icon">✓</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <p>Current Status</p>
+                        <h3 class="status-text">Ready</h3>
+                    </div>
+
+                    <div class="stat-icon">●</div>
+                </div>
+
+            </section>
+
+
+            <!-- CHECK IN AREA -->
+            <section class="checkin-grid">
+
+                <!-- CLASS SELECTION -->
+                <div class="dashboard-card selection-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <p class="card-label">STEP 01</p>
+                            <h2>Select Your Session</h2>
+                        </div>
+
+                        <span class="step-number">1</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="course-select">Class</label>
+
+                        <select id="course-select">
+                            <option value="">Choose a class</option>
+                            <option value="1">Capstone Project</option>
+                            <option value="2">Computer Networking</option>
+                            <option value="3">Software Engineering</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="session-select">Active Session</label>
+
+                        <select id="session-select">
+                            <option value="">Choose an active session</option>
+                            <option value="1">September 8 Lecture</option>
+                        </select>
+                    </div>
+
+                    <div class="session-info" id="session-info">
+
+    <div class="session-info-row">
+        <span>Course</span>
+        <strong id="session-course">—</strong>
+    </div>
+
+    <div class="session-info-row">
+        <span>Location</span>
+        <strong id="session-location">—</strong>
+    </div>
+
+    <div class="session-info-row">
+        <span>Session Time</span>
+        <strong id="session-time">—</strong>
+    </div>
+
+    <div class="session-active" id="session-status">
+        Select a session to view details
+    </div>
+
+</div>
+
+                </div>
+
+
+                <!-- CAMERA -->
+                <div class="dashboard-card camera-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <p class="card-label">STEP 02</p>
+                            <h2>Face Verification</h2>
+                        </div>
+
+                        <span class="step-number">2</span>
+                    </div>
+
+                    <div class="camera-frame">
+
+                        <video
+                            id="camera"
+                            autoplay
+                            playsinline
+                        ></video>
+
+                        <div class="camera-placeholder" id="camera-placeholder">
+                            <div class="camera-circle">◎</div>
+
+                            <h3>Camera Preview</h3>
+
+                            <p>
+                                Position your face inside the frame
+                                before checking in.
+                            </p>
+                        </div>
+
+                        <div class="face-guide"></div>
+
+                    </div>
+
+                    <button id="start-camera-button" class="secondary-button">
+                        Start Camera
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- FINAL CHECK IN -->
+            <section class="dashboard-card final-checkin-card">
+
+                <div class="final-checkin-content">
+
+                    <div>
+                        <p class="card-label">STEP 03</p>
+                        <h2>Ready to Check In?</h2>
+
+                        <p>
+                            Make sure you selected the correct class and
+                            your face is clearly visible.
+                        </p>
+                    </div>
+
+                    <button id="checkin-button" class="primary-action-button">
+                        Check In Now
+                        <span>→</span>
+                    </button>
+
+                </div>
+
+                <div id="checkin-message" class="checkin-message"></div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <canvas id="capture-canvas" hidden></canvas>
+
+    <script src="student.js"></script>
+
+</body>
+</html>
