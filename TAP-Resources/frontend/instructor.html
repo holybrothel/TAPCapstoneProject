@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>T.A.P. | Instructor Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+                <div class="logo">T</div>
+
+                <div>
+                    <h2>T.A.P.</h2>
+                    <p>Instructor Portal</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active">
+                    <span>⌂</span>
+                    Dashboard
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>＋</span>
+                    Create Session
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>▦</span>
+                    Attendance
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="student-mini-profile">
+                    <div class="profile-avatar">IN</div>
+
+                    <div>
+                        <strong>Instructor</strong>
+                        <p>Faculty</p>
+                    </div>
+                </div>
+
+                <button class="logout-button" id="instructor-logout-button">
+                    Log Out
+                </button>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-main">
+
+            <!-- HEADER -->
+            <header class="dashboard-header">
+
+                <div>
+                    <p class="dashboard-label">INSTRUCTOR DASHBOARD</p>
+                    <h1>Manage Attendance</h1>
+
+                    <p class="dashboard-subtext">
+                        Create class sessions, view enrolled students,
+                        and track attendance records.
+                    </p>
+                </div>
+
+                <div class="header-status">
+                    <span class="status-dot"></span>
+                    System Online
+                </div>
+
+            </header>
+
+
+            <!-- STATS -->
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div>
+                        <p>Active Sessions</p>
+                        <h3>1</h3>
+                    </div>
+
+                    <div class="stat-icon">●</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <p>Enrolled Students</p>
+                        <h3>24</h3>
+                    </div>
+
+                    <div class="stat-icon">♟</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <p>Present Today</p>
+                        <h3>21</h3>
+                    </div>
+
+                    <div class="stat-icon">✓</div>
+                </div>
+
+            </section>
+
+
+            <!-- TOP GRID -->
+            <section class="instructor-grid">
+
+                <!-- CREATE SESSION -->
+                <div class="dashboard-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <p class="card-label">SESSION CONTROL</p>
+                            <h2>Create Class Session</h2>
+                        </div>
+
+                        <span class="step-number">＋</span>
+                    </div>
+
+                    <form id="session-form">
+
+                        <div class="form-group">
+                            <label for="instructor-course">Course</label>
+
+                            <select id="instructor-course" required>
+                                <option value="">Choose a course</option>
+                                <option value="1">Capstone Project</option>
+                                <option value="2">Computer Networking</option>
+                                <option value="3">Software Engineering</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="session-name">Session Name</label>
+
+                            <input
+                                type="text"
+                                id="session-name"
+                                placeholder="Example: September 8 Lecture"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+                                <label for="start-time">Start Time</label>
+                                <input type="datetime-local" id="start-time" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="end-time">End Time</label>
+                                <input type="datetime-local" id="end-time" required>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="session-location">Location</label>
+
+                            <input
+                                type="text"
+                                id="session-location-input"
+                                placeholder="Example: Room 101"
+                                required
+                            >
+                        </div>
+
+                        <button type="submit" class="primary-action-button full-width-button">
+                            Create Session
+                            <span>→</span>
+                        </button>
+
+                        <p id="session-message" class="checkin-message"></p>
+
+                    </form>
+
+                </div>
+
+
+                <!-- ENROLLED STUDENTS -->
+                <div class="dashboard-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <p class="card-label">COURSE ROSTER</p>
+                            <h2>Enrolled Students</h2>
+                        </div>
+
+                        <span class="step-number">24</span>
+                    </div>
+
+                    <div class="student-search">
+                        <input
+                            type="text"
+                            id="student-search"
+                            placeholder="Search students..."
+                        >
+                    </div>
+
+                    <div class="student-list" id="student-list">
+
+                        <div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">JS</div>
+        <div>
+            <strong>John Smith</strong>
+            <p>Student ID: T00482716</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">AM</div>
+        <div>
+            <strong>Avery Morgan</strong>
+            <p>Student ID: T00193542</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">KT</div>
+        <div>
+            <strong>Kai Thompson</strong>
+            <p>Student ID: T00716483</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">MB</div>
+        <div>
+            <strong>Maya Brooks</strong>
+            <p>Student ID: T00358291</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">DJ</div>
+        <div>
+            <strong>Daniel Johnson</strong>
+            <p>Student ID: T00843157</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">SR</div>
+        <div>
+            <strong>Sophia Reed</strong>
+            <p>Student ID: T00274618</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">CJ</div>
+        <div>
+            <strong>Christopher Jones</strong>
+            <p>Student ID: T00621974</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">TW</div>
+        <div>
+            <strong>Taylor Williams</strong>
+            <p>Student ID: T00957326</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">BJ</div>
+        <div>
+            <strong>Brandon Jackson</strong>
+            <p>Student ID: T00531864</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">NW</div>
+        <div>
+            <strong>Nia Wilson</strong>
+            <p>Student ID: T00168439</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">DM</div>
+        <div>
+            <strong>Devin Mitchell</strong>
+            <p>Student ID: T00792541</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">AJ</div>
+        <div>
+            <strong>Alexis Johnson</strong>
+            <p>Student ID: T00314782</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">CM</div>
+        <div>
+            <strong>Caleb Moore</strong>
+            <p>Student ID: T00861435</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">KH</div>
+        <div>
+            <strong>Kayla Harris</strong>
+            <p>Student ID: T00439168</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">EW</div>
+        <div>
+            <strong>Elijah Walker</strong>
+            <p>Student ID: T00684317</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">MG</div>
+        <div>
+            <strong>Madison Green</strong>
+            <p>Student ID: T00251876</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">IT</div>
+        <div>
+            <strong>Isaiah Turner</strong>
+            <p>Student ID: T00926143</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">LB</div>
+        <div>
+            <strong>Lauren Brown</strong>
+            <p>Student ID: T00574291</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">JC</div>
+        <div>
+            <strong>Jordan Carter</strong>
+            <p>Student ID: T00147625</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">AR</div>
+        <div>
+            <strong>Amaya Robinson</strong>
+            <p>Student ID: T00735189</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">BH</div>
+        <div>
+            <strong>Bryce Hall</strong>
+            <p>Student ID: T00396814</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">TM</div>
+        <div>
+            <strong>Trinity Martin</strong>
+            <p>Student ID: T00812573</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">CW</div>
+        <div>
+            <strong>Cameron White</strong>
+            <p>Student ID: T00647238</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+
+<div class="student-row">
+    <div class="student-info">
+        <div class="student-avatar">RH</div>
+        <div>
+            <strong>Riley Henderson</strong>
+            <p>Student ID: T00283951</p>
+        </div>
+    </div>
+    <span class="enrolled-badge">Enrolled</span>
+</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ATTENDANCE TABLE -->
+            <section class="dashboard-card attendance-card">
+
+                <div class="attendance-header">
+
+                    <div>
+                        <p class="card-label">ATTENDANCE RECORDS</p>
+                        <h2>Current Session Attendance</h2>
+                    </div>
+
+                    <select id="attendance-session-select">
+                        <option value="1">September 8 Lecture</option>
+                    </select>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table class="attendance-table">
+
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Student ID</th>
+                                <th>Check-In Time</th>
+                                <th>Verification</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="attendance-table-body">
+
+                           <tr>
+    <td>John Smith</td>
+    <td>T00482716</td>
+    <td>10:03 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Avery Morgan</td>
+    <td>T00193542</td>
+    <td>10:04 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Kai Thompson</td>
+    <td>T00716483</td>
+    <td>10:05 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Maya Brooks</td>
+    <td>T00358291</td>
+    <td>10:06 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Daniel Johnson</td>
+    <td>T00843157</td>
+    <td>10:07 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Sophia Reed</td>
+    <td>T00274618</td>
+    <td>10:08 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Christopher Jones</td>
+    <td>T00621974</td>
+    <td>10:09 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Taylor Williams</td>
+    <td>T00957326</td>
+    <td>10:10 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Brandon Jackson</td>
+    <td>T00531864</td>
+    <td>10:11 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Nia Wilson</td>
+    <td>T00168439</td>
+    <td>10:12 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Devin Mitchell</td>
+    <td>T00792541</td>
+    <td>10:13 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Alexis Johnson</td>
+    <td>T00314782</td>
+    <td>10:14 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Caleb Moore</td>
+    <td>T00861435</td>
+    <td>10:15 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Kayla Harris</td>
+    <td>T00439168</td>
+    <td>10:16 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Elijah Walker</td>
+    <td>T00684317</td>
+    <td>10:17 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Madison Green</td>
+    <td>T00251876</td>
+    <td>10:18 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Isaiah Turner</td>
+    <td>T00926143</td>
+    <td>10:19 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Lauren Brown</td>
+    <td>T00574291</td>
+    <td>10:20 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Jordan Carter</td>
+    <td>T00147625</td>
+    <td>10:21 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Amaya Robinson</td>
+    <td>T00735189</td>
+    <td>10:22 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Bryce Hall</td>
+    <td>T00396814</td>
+    <td>10:23 AM</td>
+    <td>Face Verified</td>
+    <td><span class="attendance-badge present">Present</span></td>
+</tr>
+
+<tr>
+    <td>Trinity Martin</td>
+    <td>T00812573</td>
+    <td>—</td>
+    <td>—</td>
+    <td><span class="attendance-badge absent">Not Checked In</span></td>
+</tr>
+
+<tr>
+    <td>Cameron White</td>
+    <td>T00647238</td>
+    <td>—</td>
+    <td>—</td>
+    <td><span class="attendance-badge absent">Not Checked In</span></td>
+</tr>
+
+<tr>
+    <td>Riley Henderson</td>
+    <td>T00283951</td>
+    <td>—</td>
+    <td>—</td>
+    <td><span class="attendance-badge absent">Not Checked In</span></td>
+</tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="instructor.js"></script>
+
+</body>
+</html>
