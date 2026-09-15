@@ -78,3 +78,59 @@ const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`T.A.P. Backend running on http://localhost:${PORT}`);
 });
+
+// Create a new class session (Instructor)
+app.post('/api/sessions', async (req, res) => {
+  const { course_id, session_name, created_by = 1, is_active = true } = req.body;
+
+  if (!course_id || !session_name) {
+    return res.status(400).json({ error: 'course_id and session_name are required' });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO class_sessions (course_id, session_name, start_time, end_time, created_by, is_active)
+       VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '1 hour', $3, $4)
+       RETURNING *`,
+      [course_id, session_name, created_by, is_active]
+    );
+
+    res.status(201).json({
+      message: 'Class session created successfully',
+      session: result.rows[0]
+    });
+  } catch (err) {
+    console.error('Error creating class session:', err.message);
+    res.status(500).json({ error: 'Database server error' });
+  }
+});
+
+// User Login Route
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'email and password are required' });
+  }
+
+  try {
+    const userResult = await pool.query(
+      `SELECT user_id AS id, first_name, last_name, email, role
+       FROM users
+       WHERE email = $1 AND password_hash = $2`,
+      [email, password]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    res.json({
+      message: 'Login successful',
+      user: userResult.rows[0]
+    });
+  } catch (err) {
+    console.error('Error during login:', err.message);
+    res.status(500).json({ error: 'Database server error' });
+  }
+});
