@@ -1,3 +1,24 @@
+const studentName = localStorage.getItem("studentName") || "Student";
+
+const studentProfileName = document.getElementById("student-profile-name");
+const studentWelcomeName = document.getElementById("student-welcome-name");
+studentProfileName.textContent = studentName;
+studentWelcomeName.textContent = studentName.split(" ")[0];
+
+const studentInitials = document.getElementById("student-initials");
+
+if (studentInitials && studentName) {
+    const initials = studentName
+        .split(" ")
+        .filter(word => word.length > 0)
+        .map(word => word[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+
+    studentInitials.textContent = initials;
+}
+
 const startCameraButton = document.getElementById("start-camera-button");
 const camera = document.getElementById("camera");
 const cameraPlaceholder = document.getElementById("camera-placeholder");

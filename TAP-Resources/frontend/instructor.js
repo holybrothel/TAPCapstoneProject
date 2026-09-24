@@ -164,3 +164,78 @@ sessions.forEach(function (session) {
         console.error("Session loading error:", error);
     }
 }
+
+attendanceSessionSelect.addEventListener("change", function () {
+    const sessionId = attendanceSessionSelect.value;
+
+    if (sessionId) {
+        loadAttendance(sessionId);
+    }
+});
+
+async function loadAttendance(sessionId) {
+    const attendanceTableBody =
+        document.getElementById("attendance-table-body");
+
+    attendanceTableBody.innerHTML = `
+        <tr>
+            <td colspan="5">Loading attendance...</td>
+        </tr>
+    `;
+
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/sessions/${sessionId}/attendance`
+        );
+
+        if (!response.ok) {
+            throw new Error("Could not load attendance.");
+        }
+
+        const data = await response.json();
+        const attendanceRecords = data.attendance || [];
+
+        attendanceTableBody.innerHTML = "";
+
+        if (attendanceRecords.length === 0) {
+            attendanceTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">No attendance records yet.</td>
+                </tr>
+            `;
+            return;
+        }
+        attendanceRecords.forEach(function (record) {
+    const row = document.createElement("tr");
+
+    const checkInTime = record.check_in_time
+        ? new Date(record.check_in_time).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit"
+          })
+        : "—";
+
+    row.innerHTML = `
+        <td>${record.student_name || "Unknown Student"}</td>
+        <td>${record.student_number || "—"}</td>
+        <td>${checkInTime}</td>
+        <td>${record.verification_status || "Verified"}</td>
+        <td>
+            <span class="attendance-badge present">
+                Present
+            </span>
+        </td>
+    `;
+
+    attendanceTableBody.appendChild(row);
+});
+    } catch (error) {
+        console.error("Attendance loading error:", error);
+
+        attendanceTableBody.innerHTML = `
+            <tr>
+                <td colspan="5">Could not load attendance data.</td>
+            </tr>
+        `;
+    }
+}
