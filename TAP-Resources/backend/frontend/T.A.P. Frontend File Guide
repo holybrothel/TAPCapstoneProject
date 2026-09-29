@@ -1,0 +1,48 @@
+T.A.P. Frontend File Guide
+Derrick Ellis
+
+index.html
+- Main login page for the Tiger Attendance Portal.
+- Allows users to enter login information.
+- Lets the user choose whether they are a Student or Instructor.
+
+script.js
+- Handles the login page behavior.
+- Reads the selected role.
+- Directs the user to the correct dashboard.
+
+student.html
+- Contains the layout for the student dashboard.
+- Includes course selection, session selection, webcam area, check-in button, and status messages.
+
+student.js
+- Controls student dashboard functionality.
+- Loads course and session information.
+- Accesses the webcam.
+- Captures an image for attendance verification.
+- Sends the check-in request to the backend API.
+- Displays success or error messages.
+
+instructor.html
+- Contains the layout for the instructor dashboard.
+- Includes session creation, student roster, search, attendance records, and dashboard statistics.
+
+instructor.js
+- Handles instructor dashboard functionality.
+- Loads courses from the backend API.
+- Creates new class sessions.
+- Validates session information.
+- Loads class sessions.
+- Handles student roster search.
+- Connects instructor actions to the backend.
+
+style.css
+- Controls the visual design of the frontend.
+- Includes the maroon T.A.P. theme.
+- Styles login pages, dashboards, forms, buttons, cards, tables, status badges, and responsive layouts.
+
+Frontend Summary
+- The frontend was built using HTML, CSS, and JavaScript.
+- It provides separate interfaces for students and instructors.
+- It connects to the backend API for course, session, and attendance-related functions.
+- Some data may still use mock information while full backend and face-recognition integration is completed.

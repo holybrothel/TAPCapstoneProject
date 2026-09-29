@@ -341,6 +341,20 @@ Instructor
 Student
     │
     └── Face Profile
+
+ ### 🛠 Local Database Setup & Initial Verification
+
+To initialize and run the local development database (`tap_db`):
+
+1. **Configure Environment Variables (`.env`)**:
+   Ensure your local `.env` file matches the database configuration:
+   ```env
+   PORT=5000
+   DB_USER=tap_user
+   DB_PASSWORD=tap_password
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=tap_db   
 ```
 
 The `face_profiles` table connects a T.A.P. student account with the identity/subject used by the facial-recognition service.
