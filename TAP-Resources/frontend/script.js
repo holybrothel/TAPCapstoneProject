@@ -21,16 +21,9 @@ loginForm.addEventListener("submit", function (event) {
 
     message.style.color = "#2f7d4a";
 
-    if (role === "student") {
-        localStorage.setItem("studentName", name);
-    message.textContent = "Student login successful.";
+ message.textContent = "Instructor login successful.";
 
-    setTimeout(function () {
-        window.location.href = "student.html";
-    }, 700);
-
-} else {
-    message.textContent = "Instructor login successful.";
-}
-
+setTimeout(function () {
+    window.location.href = "instructor.html";
+}, 700);
 });
