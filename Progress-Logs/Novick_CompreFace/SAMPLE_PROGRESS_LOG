@@ -1,1 +1,9 @@
 INPUT YOUR PROGRESS LOGS IN THIS FOLDER
+- Set up of the software completed
+-Testing the software to see if it checks requirements of the project
+-Compreface does not use an interactive camera live to check in students
+-Face recognition is effective; able to identify the subject with a similarity score from 0 to 1
+- Each check-in has to be done manually and cannot be done simultaneously; not sustainable in a real scenario
+-Have to manually upload each subject's picture, troublesome.
+- Still doing more tests with the software
+-Many limitations found with the software; alternative solution as the software does not fully meet the project's requirements
