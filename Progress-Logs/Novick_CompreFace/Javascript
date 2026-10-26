@@ -1,1 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Class Check-in</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin: 2rem; }
+    video, img { width: 400px; max-width: 100%; border-radius: 8px; background: #000; }
+    #message { margin-top: 1rem; font-size: 1.2rem; min-height: 1.5rem; }
+    .ok { color: green; } .bad { color: crimson; }
+    button { font-size: 1rem; padding: .6rem 1.2rem; margin: .5rem; }
+  </style>
+</head>
+<body>
+  <h2>Class Check-in</h2>
 
+  <input id="studentId" placeholder="Student ID" autofocus>
+  <br>
+
+  <video id="video" autoplay playsinline></video>
+  <img id="photo" style="display:none" alt="Captured photo">
+  <canvas id="canvas" style="display:none"></canvas>
+  <br>
+
+  <button id="captureBtn">Capture</button>
+  <div id="message"></div>
+
+<script>
+const VERIFY_URL = "http://localhost:5000/verify";  // change to your server
+const MAX_ATTEMPTS = 3;
+
+const video = document.getElementById("video");
+const photo = document.getElementById("photo");
+const canvas = document.getElementById("canvas");
+const captureBtn = document.getElementById("captureBtn");
+const message = document.getElementById("message");
+const idInput = document.getElementById("studentId");
+
+let attempts = 0;
+
+function setMessage(text, cls = "") {
+  message.textContent = text;
+  message.className = cls;
+}
+
+function showLiveCamera() {
+  photo.style.display = "none";
+  video.style.display = "inline-block";
+  captureBtn.disabled = false;
+}
+
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" }, audio: false
+    });
+    video.srcObject = stream;
+  } catch (err) {
+    setMessage("Camera not available: " + err.message, "bad");
+    captureBtn.disabled = true;
+  }
+}
+
+function resetForNextStudent() {
+  attempts = 0;
+  idInput.value = "";
+  idInput.focus();
+  setMessage("");
+  showLiveCamera();
+}
+
+captureBtn.addEventListener("click", async () => {
+  const studentId = idInput.value.trim();
+  if (!/^[A-Za-z0-9]+$/.test(studentId)) {
+    setMessage("Enter a valid student ID first.", "bad");
+    return;
+  }
+
+  // 1. Capture the frame and show it
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+  const imageData = canvas.toDataURL("image/jpeg", 0.9);
+
+  photo.src = imageData;
+  video.style.display = "none";
+  photo.style.display = "inline-block";
+  captureBtn.disabled = true;
+  setMessage("Verifying...");
+
+  // 2. Send to Python for verification
+  try {
+    const res = await fetch(VERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: studentId, image: imageData })
+    });
+    const result = await res.json();
+
+    if (result.match) {
+      setMessage(result.message, "ok");
+      setTimeout(resetForNextStudent, 2500);   // ready for next student
+    } else {
+      attempts++;
+      if (attempts >= MAX_ATTEMPTS) {
+        setMessage("Too many failed attempts. Please see the teacher.", "bad");
+        setTimeout(resetForNextStudent, 4000);
+      } else {
+        setMessage(result.message + ` (attempt ${attempts}/${MAX_ATTEMPTS})`, "bad");
+        setTimeout(showLiveCamera, 1500);      // camera live again
+      }
+    }
+  } catch (err) {
+    setMessage("Could not reach the server.", "bad");
+    setTimeout(showLiveCamera, 1500);
+  }
+});
+
+startCamera();
+</script>
+</body>
+</html>
