@@ -1,0 +1,104 @@
+import base64
+import os
+
+import cv2
+import numpy as np
+import psycopg2
+from psycopg2.pool import SimpleConnectionPool
+from deepface import DeepFace
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # only needed if the website is on a different domain/port
+
+pool = SimpleConnectionPool(1, 5, os.environ["DATABASE_URL"])
+
+
+def decode_data_url(data_url: str):
+    encoded = data_url.split(",", 1)[1]
+    arr = np.frombuffer(base64.b64decode(encoded), np.uint8)
+    return cv2.imdecode(arr, cv2.IMREAD_COLOR)
+
+
+def bytes_to_image(raw: bytes):
+    return cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
+
+
+@app.route("/verify", methods=["POST"])
+def verify():
+    data = request.get_json(silent=True) or {}
+    student_id = str(data.get("student_id", "")).strip()
+    session_id = data.get("session_id")
+    image_data = data.get("image", "")
+
+    if not student_id.isalnum():
+        return jsonify(match=False, message="Invalid student ID."), 400
+    if not isinstance(session_id, int):
+        return jsonify(match=False, message="Invalid class session."), 400
+
+    try:
+        live_img = decode_data_url(image_data)
+        if live_img is None:
+            raise ValueError
+    except Exception:
+        return jsonify(match=False, message="Bad image data."), 400
+
+    conn = pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            # 1. Get the enrollment photo
+            cur.execute(
+                "SELECT photo FROM face_enrollments WHERE student_id = %s",
+                (student_id,),
+            )
+            row = cur.fetchone()
+            if row is None:
+                return jsonify(match=False, message="Student is not enrolled."), 404
+            enrolled_img = bytes_to_image(bytes(row[0]))
+
+            # 2. Compare faces
+            try:
+                result = DeepFace.verify(
+                    img1_path=enrolled_img,
+                    img2_path=live_img,
+                    model_name="Facenet512",
+                    detector_backend="opencv",
+                    enforce_detection=True,
+                    # anti_spoofing=True,  # enable once the basic flow works
+                )
+            except ValueError:
+                return jsonify(match=False, message="No clear face detected. Try again.")
+
+            matched = bool(result["verified"])
+            if not matched:
+                return jsonify(match=False, message="No match. Please try again.")
+
+            # 3. Record attendance (ignored if already checked in)
+            ok, buf = cv2.imencode(".jpg", live_img)
+            cur.execute(
+                """
+                INSERT INTO attendance (student_id, session_id, distance, checkin_photo)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (student_id, session_id) DO NOTHING
+                RETURNING attendance_id
+                """,
+                (student_id, session_id, float(result["distance"]),
+                 psycopg2.Binary(buf.tobytes())),
+            )
+            newly_recorded = cur.fetchone() is not None
+        conn.commit()
+    except psycopg2.Error:
+        conn.rollback()
+        app.logger.exception("Database error")
+        return jsonify(match=False, message="Server error. Please see the teacher."), 500
+    finally:
+        pool.putconn(conn)
+
+    msg = ("Match! Attendance recorded." if newly_recorded
+           else "Match! You were already checked in.")
+    return jsonify(match=True, message=msg)
+
+
+if __name__ == "__main__":
+    app.run(port=5000)
