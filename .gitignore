@@ -47,3 +47,10 @@ temp/
 # Temporary code backup files
 *.bak
 *.pre-fix.bak
+
+# Allow database setup scripts to be tracked
+!backend/database/migrations/
+!backend/database/migrations/*.sql
+!backend/database/seeds/
+!backend/database/seeds/*.sql
+!backend/schema.sql
