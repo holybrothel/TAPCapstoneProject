@@ -2,7 +2,7 @@
 
 **A beginner-friendly setup and testing guide for teammates (macOS / Apple Silicon).**
 
-> **Current status (October 27, 2026):** The instructor dashboard, Node.js API, PostgreSQL connection, and Python DeepFace service have been started together on the developer's Mac. CORS preflight has passed. **A successful end-to-end face enrollment → identification → attendance check-in has NOT yet been confirmed.** Treat that as the main test goal, not as a completed feature.
+> **Current status (October 27, 2026):** The instructor dashboard, Node.js API, PostgreSQL connection, and Python DeepFace service have been started together on the developer's Mac. CORS preflight has passed. The instructor dashboard successfully created a session, and the backend assigned the course instructor automatically; the saved record was verified in PostgreSQL. **A successful end-to-end face enrollment → identification → attendance check-in has NOT yet been confirmed.** Treat that as the main test goal, not as a completed feature.
 
 ## 0. What are we testing?
 
@@ -15,8 +15,8 @@ This is a **local development prototype**. Do not use it for real classroom atte
 - **Use the correct branch:** `coda-deepface-development`, not `main`.
 - **Use a Mac with Apple Silicon** for the commands below. Windows/Linux commands will differ.
 - **Use a consenting volunteer and test-only records.** The `/enroll` endpoint stores a JPEG reference face photo in PostgreSQL (`deepface_enrollments.photo`). Do not put database dumps or face images on public GitHub.
-- **The code branch alone does NOT include a ready-to-use database.** In the uploaded branch, `backend/database/run-migrations.js` refers to `backend/database/migrations/`, but the initial Git checkpoint did **not** include the migration `.sql` files. A teammate needs the migration files committed later **or** a securely shared database backup from the project owner. Do not skip this.
-- **The starter launcher may not be on GitHub yet.** The owner created `start-tap.command` locally after the first push. If it is absent when you clone, use the manual startup steps below; ask the owner to commit and push the launcher.
+- **Database setup is included in the branch.** Seven SQL migrations and a synthetic development seed script are committed. Run both as described below; the repository does not contain a pre-populated database.
+- **The `start-tap.command` launcher is committed.** It starts local services after dependencies and the database have been configured; the manual commands below are available for troubleshooting.
 - **Do not run `npm run dev`, `npm run db:migrate`, or `npm run db:seed` expecting them to work yet.** The current branch's `backend/package.json` only defines `npm test`; use the direct commands in this guide.
 
 ## 2. What to install (one-time setup)
@@ -125,34 +125,20 @@ Expected: `accepting connections`.
 
 If it says the database already exists, do **not** delete it. Ask the owner whether to reuse it.
 
-### 6C. Restore the schema and data — REQUIRED
+### 6C. Apply the database migrations and development seed data — REQUIRED
 
-**Choose ONE of the following paths:**
-
-**Option A (recommended once available): migration files.** Confirm this folder exists and contains `.sql` files:
-
-```bash
-ls "$HOME/Downloads/TAP-Coda/backend/database/migrations"
-```
-
-If the directory and migration files are present, run:
+The branch contains seven SQL migrations in `backend/database/migrations/` and synthetic test records in `backend/database/seeds/001_seed_dev_data.sql`. For a **new, empty local development database**, run:
 
 ```bash
 cd "$HOME/Downloads/TAP-Coda/backend"
 export DATABASE_URL="postgresql:///tap_attendance"
 node database/run-migrations.js
+node database/run-seeds.js
 ```
 
-**Option B (currently the practical path): ask the owner for a secure database dump.** The owner created `tap_attendance_checkpoint.dump` on their Mac, but **it is not in GitHub**. Ask the owner to transfer an approved, sanitized test-data backup securely (not in a public issue, pull request, or chat channel). Save it to `~/Downloads/tap_attendance_checkpoint.dump` and run:
+Expected seed output includes `Running seed: 001_seed_dev_data.sql` and `Seed data complete`. The seed script creates a fictional **Test Instructor**, **John Student**, course **CS-101**, an active enrollment, and a **Development Test Session**. It uses database-generated IDs and can be rerun without duplicating these sample records under normal single-user development conditions. The developer verified it locally; a completely fresh teammate installation still needs testing.
 
-```bash
-/opt/homebrew/opt/postgresql@17/bin/pg_restore \
-  --no-owner --no-privileges \
-  -d tap_attendance \
-  "$HOME/Downloads/tap_attendance_checkpoint.dump"
-```
-
-Restore into a **new, empty database**. If the backup contains real face photos or other personal data, do not share it until those records have been removed or an approved transfer process is in place.
+**Do not restore the owner's private database dump as part of normal setup.** Do not share biometric photos or unsanitized database backups.
 
 ### 6D. Verify the database tables
 
@@ -164,18 +150,17 @@ Look for at least: `users`, `courses`, `enrollments`, `class_sessions`, `attenda
 
 If those tables are missing, **stop here**. The website may load but recognition and attendance will not work.
 
-## 7. Prepare an instructor and course
+## 7. Verify the seeded instructor, course, and student
 
-The current instructor page sends **`createdBy: 1`** when creating a class session. This is a **temporary development limitation**, not real login/authentication. Therefore, a working local test database needs an instructor with `user_id = 1` (or the code needs to be fixed to use the logged-in instructor).
-
-Check what exists:
+The seed script should have created the fictional instructor and student and enrolled the student in **CS-101**. Verify their actual IDs rather than assuming fixed numbers:
 
 ```bash
 /opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "SELECT user_id, first_name, last_name, role FROM users ORDER BY user_id;"
 /opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "SELECT course_id, course_code, course_name, instructor_id FROM courses ORDER BY course_id;"
+/opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "SELECT student_id, course_id, status FROM enrollments;"
 ```
 
-If restoring the owner's test backup, it should include **Test Instructor (ID 1)** and **COSC 346 (course ID 1)**. Verify rather than assume. If the tables are empty, ask the owner for seed scripts or help creating test users and courses. **Do not invent IDs**: the IDs used in the browser must match the actual database.
+The updated session-creation endpoint derives `created_by` from the selected course's `instructor_id` instead of requiring frontend `createdBy: 1`. This was tested via the API and dashboard, and the resulting database record was verified. **This is not authentication or authorization**: the backend still needs to check the identity and permissions of the instructor making the request before any real deployment.
 
 ## 8. Start the three servers
 
@@ -254,13 +239,13 @@ In Chrome, open:
 Do not open the HTML file by double-clicking it from Finder (`file://...`); use the `localhost` address.
 
 1. Confirm the page loads.
-2. Choose **COSC 346** (or another real course in your test database).
+2. Choose **CS-101** (the seeded test course), or another course that exists in your database.
 3. Create a class session using a name, start time, end time, and location. Make sure end time is later than start time.
 4. Confirm the success message.
 5. Confirm the session appears in the scanner's session selector.
 6. Select **Python / DeepFace**, not Node / CompreFace, for this test.
 
-**Known issue:** Session creation uses instructor user ID `1` in the current frontend. If that user does not exist, PostgreSQL will reject the new session with a foreign-key error.
+**Development limitation:** The backend assigns the course's instructor as the session creator, but it does not yet verify that the person making the request is authenticated or authorized.
 
 ## 11. Create and enroll a consenting TEST student
 
@@ -278,7 +263,7 @@ For the scanner to recognize a student, the database must have:
 /opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "SELECT student_id, course_id, status FROM enrollments;"
 ```
 
-If no test student exists, create one using a **fictional name and non-real email**:
+The seed script should already have created **John Student** (`student@tap.local`) and enrolled that student in CS-101. Note the returned student ID for face enrollment. If you need a separate fictional test student, create one using a **fictional name and non-real email**:
 
 ```bash
 /opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "INSERT INTO users (first_name, last_name, email, role) VALUES ('Demo', 'Student', 'demo.student@tap.local', 'student') RETURNING user_id;"
@@ -292,10 +277,10 @@ Find your course ID:
 /opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "SELECT course_id, course_code FROM courses;"
 ```
 
-To enroll the demo student in COSC 346, run this command (it looks up IDs by email and course code rather than guessing):
+To enroll an additional demo student in CS-101, run this command (it looks up IDs by email and course code rather than guessing):
 
 ```bash
-/opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "INSERT INTO enrollments (student_id, course_id) SELECT u.user_id, c.course_id FROM users u CROSS JOIN courses c WHERE u.email = 'demo.student@tap.local' AND c.course_code = 'COSC 346' ON CONFLICT (student_id, course_id) DO UPDATE SET status = 'active' RETURNING student_id, course_id, status;"
+/opt/homebrew/opt/postgresql@17/bin/psql -d tap_attendance -c "INSERT INTO enrollments (student_id, course_id) SELECT u.user_id, c.course_id FROM users u CROSS JOIN courses c WHERE u.email = 'demo.student@tap.local' AND c.course_code = 'CS-101' ON CONFLICT (student_id, course_id) DO UPDATE SET status = 'active' RETURNING student_id, course_id, status;"
 ```
 
 If the command returns zero rows, the course or demo student wasn't found. Fix that before continuing.
@@ -365,7 +350,7 @@ When reporting a bug, include: **step number**, what you clicked, expected resul
 | Browser CORS error | Confirm `FRONTEND_ORIGIN=http://localhost:5500` was set **before** starting Python; rerun the CORS test. |
 | PostgreSQL connection error | Start `postgresql@17`, check `pg_isready`, verify `DATABASE_URL`. |
 | `relation ... does not exist` | Database schema is missing. Complete Step 6. |
-| `class_sessions_created_by_fkey` | Instructor ID `1` does not exist; current frontend hardcodes that ID. |
+| `class_sessions_created_by_fkey` | Verify the selected course has a valid `instructor_id` and the updated backend is running. |
 | Course dropdown empty | Check `courses` table and Node server logs. |
 | Session dropdown empty | Create a session and verify the correct course is selected. |
 | `Student user ID not found` | Add a test student to `users` with `role='student'`. |
@@ -396,16 +381,18 @@ If `start-tap.command` has been committed and works on your Mac, you can use it 
 - For changes, commit and push your branch, then open a pull request for review.
 - Do not run unreviewed database migration scripts against someone else's real data.
 
-## 17. Known unfinished work / owner action items
+## 17. Completed milestones and remaining work
 
-1. **Commit the missing SQL migration files** (and any appropriate sanitized seed scripts) so a new teammate can create the database from scratch without receiving a dump.
-2. **Commit and push `start-tap.command`**, if it is not yet on the GitHub branch.
-3. **Pin Python dependencies** in `requirements.txt` after testing a reproducible install.
-4. **Replace hardcoded `createdBy: 1`** with the actual authenticated instructor's ID.
-5. **Implement proper authentication and authorization** before any real deployment. The older `backend/server.js` contains a direct password comparison and should not be treated as production-ready authentication.
-6. **Confirm a full end-to-end DeepFace test** and document the exact observed results.
-7. **Review npm dependency vulnerabilities** and decide on safe updates.
-8. **Plan biometric data retention/deletion and secure storage** before any real student use.
+**Completed and pushed to `coda-deepface-development`:** Seven SQL migrations, synthetic development seed data, `start-tap.command`, and the initial setup guide. The session-creation instructor assignment fix was validated through the API, PostgreSQL, and the dashboard; commit and push the JavaScript changes separately if they are not yet on the remote branch.
+
+**Remaining:**
+
+1. **Verify a fresh teammate install** using the migration and seed commands above.
+2. **Pin Python dependencies** in `requirements.txt` after testing a reproducible install.
+3. **Implement real authentication and authorization** for instructors. The current course-instructor lookup is not an access-control mechanism; the older `backend/server.js` should not be treated as production-ready authentication.
+4. **Confirm a full end-to-end DeepFace test**: face enrollment, identification, correct attendance row, duplicate prevention, and rejection of unknown faces.
+5. **Review npm dependency vulnerabilities** and decide on safe updates.
+6. **Plan biometric data retention/deletion and secure storage** before any real student use.
 
 ---
 
