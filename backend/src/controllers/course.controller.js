@@ -60,12 +60,12 @@ async function listSessions(req, res, next) {
 async function createSession(req, res, next) {
   try {
     const { courseId } = req.params;
+
     const {
       sessionName,
       startTime,
       endTime = null,
       location = null,
-      createdBy = null,
       status = "active"
     } = req.body;
 
@@ -80,10 +80,21 @@ async function createSession(req, res, next) {
     const result = await pool.query(
       `INSERT INTO class_sessions
         (course_id, session_name, start_time, end_time, location, created_by, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       SELECT c.course_id, $2, $3, $4, $5, c.instructor_id, $6
+       FROM courses c
+       WHERE c.course_id = $1
+         AND c.instructor_id IS NOT NULL
        RETURNING *`,
-      [courseId, sessionName, startTime, endTime, location, createdBy, status]
+      [courseId, sessionName, startTime, endTime, location, status]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "COURSE_NOT_FOUND",
+        message: "Course not found or no instructor assigned"
+      });
+    }
 
     res.status(201).json({
       success: true,

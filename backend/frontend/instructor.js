@@ -50,7 +50,7 @@ sessionForm.addEventListener("submit", async function (event) {
                     startTime: startTime,
                     endTime: endTime,
                     location: location,
-                    createdBy: 1,
+                    
                     status: "active"
                 })
             }
