@@ -1,6 +1,6 @@
 # T.A.P. — Coda DeepFace Development Branch
 
-**A beginner-friendly setup and testing guide for teammates (macOS / Apple Silicon).**
+**A beginner-friendly setup and testing guide for teammates (macOS / Apple Silicon, Windows 11, and Ubuntu/Debian Linux).**
 
 > **Current status (October 27, 2026):** The instructor dashboard, Node.js API, PostgreSQL connection, and Python DeepFace service have been started together on the developer's Mac. CORS preflight has passed. The instructor dashboard successfully created a session, and the backend assigned the course instructor automatically; the saved record was verified in PostgreSQL. **A successful end-to-end face enrollment → identification → attendance check-in has NOT yet been confirmed.** Treat that as the main test goal, not as a completed feature.
 
@@ -13,13 +13,13 @@ This is a **local development prototype**. Do not use it for real classroom atte
 ## 1. Important before you begin
 
 - **Use the correct branch:** `coda-deepface-development`, not `main`.
-- **Use a Mac with Apple Silicon** for the commands below. Windows/Linux commands will differ.
+- **Choose the instructions for your operating system.** Sections 2–8 use macOS commands. Windows and Linux setup instructions appear in the platform-specific appendices below. Everyone can follow Sections 9–17 for testing, substituting the appropriate PostgreSQL command (`psql`) for the macOS-specific path.
 - **Use a consenting volunteer and test-only records.** The `/enroll` endpoint stores a JPEG reference face photo in PostgreSQL (`deepface_enrollments.photo`). Do not put database dumps or face images on public GitHub.
 - **Database setup is included in the branch.** Seven SQL migrations and a synthetic development seed script are committed. Run both as described below; the repository does not contain a pre-populated database.
 - **The `start-tap.command` launcher is committed.** It starts local services after dependencies and the database have been configured; the manual commands below are available for troubleshooting.
 - **Do not run `npm run dev`, `npm run db:migrate`, or `npm run db:seed` expecting them to work yet.** The current branch's `backend/package.json` only defines `npm test`; use the direct commands in this guide.
 
-## 2. What to install (one-time setup)
+## 2. macOS (Apple Silicon): What to install (one-time setup)
 
 Open **Terminal** (Applications → Utilities → Terminal).
 
@@ -402,3 +402,237 @@ If `start-tap.command` has been committed and works on your Mac, you can use it 
 **Frontend:** http://localhost:5500/instructor.html  
 **Node API:** http://localhost:3000/api/health  
 **Python API:** http://127.0.0.1:5000/health
+
+
+---
+
+## 18. Windows 11 installation (PowerShell)
+
+**Status: installation instructions provided, but not yet verified on a teammate's Windows PC.** Use **Windows PowerShell**, not Command Prompt or Git Bash, for the commands in this section. Commands are intended for a local development machine, not production deployment.
+
+### 18A. Install required software
+
+Install these from their official websites, choosing **64-bit** builds:
+
+- **Git for Windows:** https://git-scm.com/download/win
+- **Node.js (LTS):** https://nodejs.org/en/download
+- **Python 3.11:** https://www.python.org/downloads/ (select a Python 3.11.x release; enable **Add Python to PATH** when installing)
+- **PostgreSQL 17:** https://www.postgresql.org/download/windows/ (the EDB installer includes PostgreSQL and `psql`; remember the `postgres` account password you set)
+
+Open a **new PowerShell** after installation and verify:
+
+```powershell
+ git --version
+ node --version
+ npm --version
+ py -3.11 --version
+```
+
+If PowerShell blocks `npm` scripts, use `npm.cmd` instead of `npm`; do not change system-wide execution policy just to install dependencies. PostgreSQL's `psql.exe` is normally at `C:\Program Files\PostgreSQL\17\bin\psql.exe`.
+
+### 18B. Clone the project and install Node dependencies
+
+```powershell
+Set-Location "$HOME\Downloads"
+git clone --branch coda-deepface-development --single-branch https://github.com/holybrothel/TAPCapstoneProject.git TAP-Coda
+Set-Location "$HOME\Downloads\TAP-Coda\backend"
+npm.cmd ci
+```
+
+### 18C. Create the Python environment
+
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install deepface flask flask-cors psycopg2-binary opencv-python numpy tf-keras
+.\.venv\Scripts\python.exe -c "import deepface, flask, flask_cors, psycopg2, cv2; print('Python packages imported OK')"
+```
+
+Using `.venv\Scripts\python.exe` directly avoids PowerShell's virtual-environment activation policy. DeepFace/TensorFlow installation on Windows can be version-sensitive; if it fails, report the exact error and Python version. **Do not assume GPU acceleration is available**; CPU inference is acceptable for initial testing.
+
+### 18D. Create the local PostgreSQL database
+
+Make sure the PostgreSQL 17 Windows service is running (open **Services**, find the PostgreSQL 17 service, and start it if necessary). Then run:
+
+```powershell
+$psql = "C:\Program Files\PostgreSQL\17\bin\psql.exe"
+& $psql -U postgres -h localhost -d postgres -c "CREATE USER tap_dev WITH PASSWORD 'change-this-local-password';"
+& $psql -U postgres -h localhost -d postgres -c "CREATE DATABASE tap_attendance OWNER tap_dev;"
+```
+
+The `postgres` commands prompt for the administrator password chosen during installation. **Replace `change-this-local-password` with a unique local development password**. If the role/database already exists, inspect it instead of deleting it. These commands are intended for a new installation.
+
+Set the database URL in each PowerShell window that runs a backend service. Replace the password with the same local password; URL-encode special characters in it (or use an alphanumeric test-only password):
+
+```powershell
+$env:DATABASE_URL = "postgresql://tap_dev:change-this-local-password@localhost:5432/tap_attendance"
+```
+
+**Never commit a real database password to Git.** This environment variable lasts only for the current PowerShell process.
+
+### 18E. Apply migrations and seed sample data
+
+From `TAP-Coda\backend`, with `DATABASE_URL` set:
+
+```powershell
+node database/run-migrations.js
+node database/run-seeds.js
+& $psql -U tap_dev -h localhost -d tap_attendance -c "SELECT course_id, course_code FROM courses;"
+```
+
+You should see **CS-101**. The last command prompts for your `tap_dev` password. For repeat runs, review existing records first; never drop the database merely to reset a test.
+
+### 18F. Start the three servers
+
+Open **three separate PowerShell windows**. In each one, navigate to the backend folder:
+
+```powershell
+Set-Location "$HOME\Downloads\TAP-Coda\backend"
+```
+
+**Window A — DeepFace (5000):**
+
+```powershell
+$env:DATABASE_URL = "postgresql://tap_dev:change-this-local-password@localhost:5432/tap_attendance"
+$env:FRONTEND_ORIGIN = "http://localhost:5500"
+.\.venv\Scripts\python.exe database/deepface_service.py
+```
+
+**Window B — Node.js (3000):**
+
+```powershell
+$env:DATABASE_URL = "postgresql://tap_dev:change-this-local-password@localhost:5432/tap_attendance"
+node src/server.js
+```
+
+**Window C — Frontend (5500):**
+
+```powershell
+.\.venv\Scripts\python.exe -m http.server 5500 --directory frontend
+```
+
+Test in a **fourth PowerShell window**:
+
+```powershell
+curl.exe http://127.0.0.1:5000/health
+curl.exe http://localhost:3000/api/health
+curl.exe -I http://localhost:5500/instructor.html
+```
+
+Open **http://localhost:5500/instructor.html** in Chrome. Continue with Sections 10–13. For SQL verification commands in those sections, use `& $psql -U tap_dev -h localhost -d tap_attendance -c "SQL HERE"` (define `$psql` again in any new PowerShell window). The macOS `start-tap.command` launcher **does not run natively on Windows**.
+
+---
+
+## 19. Ubuntu / Debian Linux installation (Bash)
+
+**Status: installation instructions provided, but not yet verified on a teammate's Linux machine.** Commands below target a recent Ubuntu/Debian desktop using Bash and `apt`. Other distributions need different package installation commands. PostgreSQL 17 availability varies by distribution release; use the official PostgreSQL APT repository if your default repository does not offer version 17: https://www.postgresql.org/download/linux/ubuntu/ or https://www.postgresql.org/download/linux/debian/ .
+
+### 19A. Install dependencies
+
+Install **Git**, **Node.js LTS + npm**, **Python 3.11 with `venv` and `pip`**, and **PostgreSQL 17 server/client**. For Node.js, follow https://nodejs.org/en/download and verify `node --version` and `npm --version`. For Python 3.11, use your distribution's packages if available; otherwise use an officially supported installation method for your distribution. Do not replace your OS's system Python.
+
+After configuring the appropriate package repositories, a typical Ubuntu/Debian installation command is:
+
+```bash
+sudo apt update
+sudo apt install -y git build-essential python3.11 python3.11-venv python3-pip libgl1 libglib2.0-0 postgresql-17 postgresql-client-17
+```
+
+If `python3.11` or `postgresql-17` cannot be located, stop and install that version using your distribution's supported repository instructions rather than substituting an arbitrary version. TensorFlow wheels are architecture- and Python-version-dependent; **x86-64 Linux is the intended starting point**. Verify:
+
+```bash
+git --version
+node --version
+npm --version
+python3.11 --version
+psql --version
+```
+
+### 19B. Clone and install dependencies
+
+```bash
+cd "$HOME/Downloads"
+git clone --branch coda-deepface-development --single-branch https://github.com/holybrothel/TAPCapstoneProject.git TAP-Coda
+cd "$HOME/Downloads/TAP-Coda/backend"
+npm ci
+python3.11 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install deepface flask flask-cors psycopg2-binary opencv-python numpy tf-keras
+.venv/bin/python -c "import deepface, flask, flask_cors, psycopg2, cv2; print('Python packages imported OK')"
+```
+
+### 19C. Configure PostgreSQL
+
+Start PostgreSQL using your distribution's service manager:
+
+```bash
+sudo systemctl enable --now postgresql
+sudo -u postgres psql -c "CREATE USER tap_dev WITH PASSWORD 'change-this-local-password';"
+sudo -u postgres psql -c "CREATE DATABASE tap_attendance OWNER tap_dev;"
+```
+
+Replace the placeholder password with a unique local development password. If the role/database already exists, inspect it instead of deleting it. Set the URL in each Bash window running a backend service:
+
+```bash
+export DATABASE_URL='postgresql://tap_dev:change-this-local-password@localhost:5432/tap_attendance'
+```
+
+URL-encode special characters in passwords. Do not commit credentials to Git.
+
+### 19D. Run migrations and seed data
+
+From the `backend` folder, with `DATABASE_URL` set:
+
+```bash
+node database/run-migrations.js
+node database/run-seeds.js
+psql "$DATABASE_URL" -c 'SELECT course_id, course_code FROM courses;'
+```
+
+Confirm that **CS-101** exists.
+
+### 19E. Start the three servers
+
+Open **three Bash terminals**. Run `cd "$HOME/Downloads/TAP-Coda/backend"` in each.
+
+**Terminal A — DeepFace (5000):**
+
+```bash
+export DATABASE_URL='postgresql://tap_dev:change-this-local-password@localhost:5432/tap_attendance'
+export FRONTEND_ORIGIN='http://localhost:5500'
+.venv/bin/python database/deepface_service.py
+```
+
+**Terminal B — Node.js (3000):**
+
+```bash
+export DATABASE_URL='postgresql://tap_dev:change-this-local-password@localhost:5432/tap_attendance'
+node src/server.js
+```
+
+**Terminal C — Frontend (5500):**
+
+```bash
+.venv/bin/python -m http.server 5500 --directory frontend
+```
+
+Verify in a fourth terminal:
+
+```bash
+curl http://127.0.0.1:5000/health
+curl http://localhost:3000/api/health
+curl -I http://localhost:5500/instructor.html
+```
+
+Open **http://localhost:5500/instructor.html** and continue with Sections 10–13. For SQL verification commands, use `psql "$DATABASE_URL" -c 'SQL HERE'` instead of the macOS-specific `/opt/homebrew/.../psql` path. The macOS `start-tap.command` launcher is **not a Linux setup script**.
+
+---
+
+## 20. Cross-platform testing notes
+
+- **Verified:** macOS developer environment, PostgreSQL migrations and seed script on that Mac, DeepFace `/health`, Node API, and creating a session from the instructor dashboard with the correct instructor assignment.
+- **Not yet verified:** a clean clone/install on Windows or Linux, or a complete face enrollment → identification → attendance record flow on any operating system.
+- **Python dependencies are not pinned:** the `pip install` commands may resolve to newer versions over time; report version and installation errors to the team. A tested `requirements.txt` is a future improvement.
+- **Local database only:** teammates each have their own PostgreSQL data; cloned code does not include the developer's database or face images.
+- **Security:** use synthetic test accounts and consenting volunteers only. Do not publish face photos, database backups, `.env` files, or credentials. Instructor authorization is not implemented for real deployment.
+- **Report issues with:** OS and version, CPU architecture, Python/Node/PostgreSQL versions, exact command, error text, and whether ports 3000/5000/5500 are running. Never include passwords or biometric data in reports.
