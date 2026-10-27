@@ -1,0 +1,49 @@
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Database backups and local databases
+*.sql
+*.dump
+*.backup
+*.sqlite
+*.sqlite3
+backups/
+
+# Face recognition images and biometric data
+face_data/
+face_images/
+face_profiles/
+enrolled_faces/
+uploads/
+biometric_data/
+
+# macOS files
+.DS_Store
+
+# IDE and editor files
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+
+# Temporary code backup files
+*.bak
+*.pre-fix.bak

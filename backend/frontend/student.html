@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>T.A.P. | Student Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+                <div class="logo">T</div>
+
+                <div>
+                    <h2>T.A.P.</h2>
+                    <p>Student Portal</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active">
+                    <span>⌂</span>
+                    Dashboard
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>✓</span>
+                    Attendance Info
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>▦</span>
+                    Attendance
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="student-mini-profile">
+                    <div class="profile-avatar">DE</div>
+
+                    <div>
+                        <strong>Derrick Ellis</strong>
+                        <p>Student</p>
+                    </div>
+                </div>
+
+                <button class="logout-button" id="logout-button">
+                    Log Out
+                </button>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-main">
+
+            <!-- TOP BAR -->
+            <header class="dashboard-header">
+
+                <div>
+                    <p class="dashboard-label">STUDENT DASHBOARD</p>
+                    <h1>Welcome back, Derrick.</h1>
+                    <p class="dashboard-subtext">
+                        View your attendance information. Your instructor handles face verification.
+                    </p>
+                </div>
+
+                <div class="header-status">
+                    <span class="status-dot"></span>
+                    System Online
+                </div>
+
+            </header>
+
+
+            <!-- QUICK STATS -->
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div>
+                        <p>Today's Classes</p>
+                        <h3>3</h3>
+                    </div>
+
+                    <div class="stat-icon">▦</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <p>Attendance Rate</p>
+                        <h3>96%</h3>
+                    </div>
+
+                    <div class="stat-icon">✓</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <p>Current Status</p>
+                        <h3 class="status-text">Ready</h3>
+                    </div>
+
+                    <div class="stat-icon">●</div>
+                </div>
+
+            </section>
+
+
+            <section class="dashboard-card" style="padding:28px;margin-top:24px">
+                <p class="card-label">ATTENDANCE OVERVIEW</p>
+                <h2>Attendance is managed by your instructor</h2>
+                <p>Your instructor will scan faces during class. No camera access is required in the student portal.</p>
+                <p>Contact your instructor if you need an attendance correction.</p>
+            </section>
+        </main>
+
+    </div>
+
+
+
+    <script src="student.js"></script>
+
+</body>
+</html>

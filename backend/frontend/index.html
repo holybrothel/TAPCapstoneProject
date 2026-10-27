@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>T.A.P. | Tiger Attendance Portal</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="login-page">
+
+        <!-- LEFT SIDE -->
+        <section class="brand-panel">
+
+            <div class="brand">
+                <div class="logo">T</div>
+
+                <div>
+                    <h2>T.A.P.</h2>
+                    <p>Tiger Attendance Portal</p>
+                </div>
+            </div>
+
+            <div class="hero-content">
+                <span class="system-badge">SMART ATTENDANCE SYSTEM</span>
+
+                <h1>
+                    Attendance made
+                    <span>simple.</span>
+                </h1>
+
+                <p class="hero-description">
+                    A faster and more secure way for students and
+                    instructors to manage classroom attendance.
+                </p>
+
+                <div class="feature-list">
+
+                    <div class="feature">
+                        <div class="feature-icon">✓</div>
+                        <div>
+                            <strong>Fast Check-In</strong>
+                            <p>Quick and simple classroom attendance.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon">⌁</div>
+                        <div>
+                            <strong>Secure Verification</strong>
+                            <p>Designed for QR and facial verification.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon">▦</div>
+                        <div>
+                            <strong>Attendance Tracking</strong>
+                            <p>Keep accurate attendance records in one place.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <p class="footer-text">
+                T.A.P. • Tiger Attendance Portal
+            </p>
+
+        </section>
+
+
+        <!-- RIGHT SIDE -->
+        <section class="login-panel">
+
+            <div class="login-card">
+
+                <div class="mobile-brand">
+                    <div class="logo">T</div>
+                    <h2>T.A.P.</h2>
+                </div>
+
+                <div class="login-header">
+                    <p class="welcome-label">WELCOME BACK</p>
+                    <h2>Sign in to your account</h2>
+                    <p>Enter your information to access the attendance portal.</p>
+                </div>
+
+                <form id="login-form">
+
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="name@university.edu"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <div class="password-label">
+                            <label for="password">Password</label>
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                        </div>
+
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Sign in as</label>
+
+                        <select id="role" required>
+                            <option value="student">Student</option>
+                            <option value="instructor">Instructor</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="login-button">
+                        Sign In
+                        <span>→</span>
+                    </button>
+
+                    <p id="message"></p>
+
+                </form>
+
+                <div class="security-note">
+                    <span>●</span>
+                    Secure attendance portal
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
