@@ -2,7 +2,7 @@ const API_BASE_URL = "http://localhost:3000/api";
 
 const sessionForm = document.getElementById("session-form");
 const courseSelect = document.getElementById("instructor-course");
-const attendanceSessionSelect = document.getElementById("attendance-session");
+const attendanceSessionSelect = document.getElementById("attendance-session-select");
 const sessionNameInput = document.getElementById("session-name");
 const startTimeInput = document.getElementById("start-time");
 const endTimeInput = document.getElementById("end-time");
@@ -168,4 +168,69 @@ sessions.forEach(function (session) {
 // Make the existing logout button functional.
 document.getElementById("instructor-logout-button")?.addEventListener("click", () => {
     window.location.href = "index.html";
+});
+
+attendanceSessionSelect.addEventListener("change", async function () {
+    const sessionId = attendanceSessionSelect.value;
+
+    if (!sessionId) return;
+
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/sessions/${sessionId}/attendance`
+        );
+
+        if (!response.ok) {
+            throw new Error("Could not load attendance.");
+        }
+
+        const data = await response.json();
+        const attendanceTableBody = document.getElementById("attendance-table-body");
+
+attendanceTableBody.innerHTML = "";
+
+if (data.attendance.length === 0) {
+    attendanceTableBody.innerHTML =
+        '<tr><td colspan="5">No attendance recorded for this session yet.</td></tr>';
+} else {
+    data.attendance.forEach(function (record) {
+        const row = document.createElement("tr");
+
+        const studentName = `${record.first_name || ""} ${record.last_name || ""}`.trim();
+        const studentId = record.student_number || record.student_id;
+        const checkInTime = record.check_in_time
+            ? new Date(record.check_in_time).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+            : "—";
+
+        const values = [
+            studentName || "Unknown Student",
+            studentId || "—",
+            checkInTime,
+            record.verification_status === "verified" ? "Face Verified" : (record.verification_status || "—"),
+            "Present"
+        ];
+
+        values.forEach(function (value) {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+const statusCell = row.lastElementChild;
+
+statusCell.textContent = "";
+
+const statusBadge = document.createElement("span");
+statusBadge.className = "attendance-badge present";
+statusBadge.textContent = "Present";
+
+statusCell.appendChild(statusBadge);
+        attendanceTableBody.appendChild(row);
+    });
+}
+    } catch (error) {
+        console.error("Attendance loading error:", error);
+    }
 });
